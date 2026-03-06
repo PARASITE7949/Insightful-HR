@@ -66,7 +66,7 @@ const adminNav: NavItem[] = [
   { label: "Pending Approvals", href: "/admin/pending-approvals", icon: <Shield className="h-5 w-5" /> },
   { label: "Departments", href: "/admin/departments", icon: <Building2 className="h-5 w-5" /> },
   { label: "Reports", href: "/admin/reports", icon: <FileText className="h-5 w-5" /> },
-  { label: "Calendar", href: "/hr/calendar", icon: <Calendar className="h-5 w-5" /> },
+  { label: "Calendar", href: "/admin/calendar", icon: <Calendar className="h-5 w-5" /> },
   { label: "Settings", href: "/admin/settings", icon: <Settings className="h-5 w-5" /> },
   { label: "Security", href: "/admin/security", icon: <Shield className="h-5 w-5" /> },
 ];
@@ -85,15 +85,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const company = getCompanyById(user.companyId);
 
-  const navItems = 
+  const navItems =
     user.role === "employee" ? employeeNav :
-    user.role === "hr_manager" ? hrNav :
-    adminNav;
+      user.role === "hr_manager" ? hrNav :
+        adminNav;
 
-  const roleLabel = 
+  const roleLabel =
     user.role === "employee" ? "Employee Portal" :
-    user.role === "hr_manager" ? "HR Portal" :
-    user.role === "admin_staff" ? "Admin Portal" : "Portal";
+      user.role === "hr_manager" ? "HR Portal" :
+        user.role === "admin_staff" ? "Admin Portal" : "Portal";
 
   const handleLogout = () => {
     logout();
@@ -137,13 +137,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <p className="text-xs text-sidebar-foreground/70">{roleLabel}</p>
         </div>
       </div>
-      
+
       <nav className="flex-1 space-y-1 p-4">
         {navItems.map((item) => {
           const isActive = location.pathname === item.href;
           const isPendingApprovalsLink = item.href === "/admin/pending-approvals";
           const showBadge = isPendingApprovalsLink && pendingCount > 0;
-          
+
           return (
             <Link
               key={item.href}
