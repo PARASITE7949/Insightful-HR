@@ -48,7 +48,7 @@ const appraisalSchema = new Schema<AppraisalDocument>(
       type: Number,
       default: 0,
     },
-    projectScore: {
+    projectDeliveryScore: {
       type: Number,
       default: 0,
     },

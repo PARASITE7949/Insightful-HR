@@ -58,7 +58,7 @@ export interface IAppraisalReport {
   attendanceScore: number;
   punctualityScore: number;
   taskCompletionScore: number;
-  projectScore: number;
+  projectDeliveryScore: number;
   overallScore: number;
   aiAnalysis?: string;
   status: "pending" | "reviewed" | "approved" | "rejected";
