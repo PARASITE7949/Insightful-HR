@@ -17,7 +17,7 @@ export const createHoliday = async (req: Request, res: Response) => {
 
     const { date, name, type, description, isRecurring, recurringMonth, recurringDay } = req.body;
 
-    const holiday = new Holiday({
+    const holiday = await Holiday.create({
       _id: uuidv4(),
       companyId: req.user.companyId,
       date,
@@ -28,8 +28,6 @@ export const createHoliday = async (req: Request, res: Response) => {
       recurringMonth,
       recurringDay,
     });
-
-    await holiday.save();
 
     // Send notifications to all company staff
     const users = await User.find({
@@ -97,7 +95,7 @@ export const getHolidays = async (req: Request, res: Response) => {
       const startDate = `${yearStr}-${monthStr}-01`;
       const daysInMonth = new Date(parseInt(yearStr), parseInt(month as string), 0).getDate();
       const endDate = `${yearStr}-${monthStr}-${daysInMonth.toString().padStart(2, "0")}`;
-      
+
       // Get specific month holidays
       query.date = { $gte: startDate, $lte: endDate };
     }

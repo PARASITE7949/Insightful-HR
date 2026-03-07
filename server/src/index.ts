@@ -21,20 +21,42 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
-const frontendOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "http://localhost:8080").split(",").map((s: string) => s.trim());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:8080",
+  "http://localhost:8082",
+  "https://insightful-hr.onrender.com",
+  "https://insightful-hr-1.onrender.com"
+];
+
+const frontendOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "").split(",").map((s: string) => s.trim()).filter(Boolean);
+allowedOrigins.push(...frontendOrigins);
 
 app.use(cors({
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     // Allow non-browser requests like curl/postman (no origin)
     if (!origin) return callback(null, true);
-    if (frontendOrigins.includes(origin)) return callback(null, true);
-    // Allow localhost origins during development (any port)
-    if (origin.startsWith("http://localhost") || origin.startsWith("https://localhost")) {
+
+    // Check if origin is in allowed list or starts with localhost
+    if (allowedOrigins.includes(origin) || origin.startsWith("http://localhost") || origin.startsWith("https://localhost")) {
       return callback(null, true);
     }
+
+    // For production flexibility, if we are in production, maybe be more lenient or log the rejected origin
+    if (process.env.NODE_ENV === "production") {
+      // In production, we might want to log it but still allow it if we are troubleshooting
+      console.log(`CORS attempt from: ${origin}`);
+      // For now, let's allow all render origins to avoid blocking the user
+      if (origin.endsWith(".onrender.com")) {
+        return callback(null, true);
+      }
+    }
+
     return callback(new Error("CORS policy: origin not allowed"));
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
 }));
 app.use(express.json());
 app.use(morgan("dev"));

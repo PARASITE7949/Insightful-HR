@@ -22,7 +22,7 @@ export const createAttendanceRecord = async (req: Request, res: Response) => {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
 
-    const attendance = new Attendance({
+    const attendance = await Attendance.create({
       _id: uuidv4(),
       userId,
       companyId: req.user.companyId,
@@ -32,8 +32,6 @@ export const createAttendanceRecord = async (req: Request, res: Response) => {
       status,
       workingHours,
     });
-
-    await attendance.save();
 
     await SystemLog.create({
       userId: req.user.userId,
@@ -152,7 +150,7 @@ export const createTask = async (req: Request, res: Response) => {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
 
-    const task = new Task({
+    const task = await Task.create({
       _id: uuidv4(),
       userId,
       companyId: req.user.companyId,
@@ -163,8 +161,6 @@ export const createTask = async (req: Request, res: Response) => {
       priority: priority || "medium",
       dueDate,
     });
-
-    await task.save();
 
     await SystemLog.create({
       userId: req.user.userId,
@@ -629,9 +625,11 @@ export const generateMonthlyAppraisals = async (req: Request, res: Response) => 
         );
 
         // Create appraisal record
-        const appraisal = new Appraisal({
+        const appraisal = await Appraisal.create({
           _id: uuidv4(),
           userId: employee._id,
+          employeeName: employee.name,
+          department: employee.department,
           companyId: req.user.companyId,
           month: monthName,
           year,
@@ -642,8 +640,6 @@ export const generateMonthlyAppraisals = async (req: Request, res: Response) => 
           status: "pending",
           generatedAt: new Date(),
         });
-
-        await appraisal.save();
         appraisals.push(appraisal);
         generatedCount++;
 

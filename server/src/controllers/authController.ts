@@ -30,17 +30,16 @@ export const registerCompany = async (req: Request, res: Response) => {
     const companyId = uuidv4();
 
     // Create company
-    const company = new Company({
+    const company = await Company.create({
       _id: companyId,
       name,
       domain: domain.toLowerCase(),
       adminId,
     });
-    await company.save();
 
     // Create admin user
     const hashedPassword = await hashPassword(adminPassword);
-    const user = new User({
+    const user = await User.create({
       _id: adminId,
       companyId,
       email: adminEmail.toLowerCase(),
@@ -55,7 +54,6 @@ export const registerCompany = async (req: Request, res: Response) => {
       isActive: true,
       joinDate: new Date(),
     });
-    await user.save();
 
     // Log the action
     await SystemLog.create({
@@ -111,7 +109,7 @@ export const register = async (req: Request, res: Response) => {
     const userId = uuidv4();
     const hashedPassword = await hashPassword(password);
 
-    const user = new User({
+    const user = await User.create({
       _id: userId,
       companyId: company._id,
       email: email.toLowerCase(),
@@ -126,8 +124,6 @@ export const register = async (req: Request, res: Response) => {
       isActive: true,
       joinDate: new Date(),
     });
-
-    await user.save();
 
     // Log the action
     await SystemLog.create({
