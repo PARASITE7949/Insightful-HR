@@ -73,7 +73,7 @@ app.use((req: Request, res: Response) => {
 // Connect to database and start server
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server is running on http://localhost:${PORT}`);
   });
 });
 
