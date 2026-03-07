@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import User from "@/models/User";
-import Company from "@/models/Company";
-import SystemLog from "@/models/SystemLog";
-import { hashPassword, comparePassword, generateToken, extractDomainFromEmail } from "@/utils/auth";
+import User from "../models/User";
+import Company from "../models/Company";
+import SystemLog from "../models/SystemLog";
+import { hashPassword, comparePassword, generateToken, extractDomainFromEmail } from "../utils/auth";
 
 export const registerCompany = async (req: Request, res: Response) => {
   try {

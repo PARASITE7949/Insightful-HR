@@ -71,9 +71,14 @@ export const getAttendanceRecords = async (req: Request, res: Response) => {
     let query: any = { userId, companyId: req.user.companyId };
 
     if (month && year) {
-      const startDate = new Date(`${year}-${month}-01`);
-      const endDate = new Date(parseInt(year as string), parseInt(month as string), 0);
-      query.date = { $gte: startDate.toISOString().split("T")[0], $lte: endDate.toISOString().split("T")[0] };
+      const paddedMonth = month.toString().padStart(2, "0");
+      const startDateStr = `${year}-${paddedMonth}-01`;
+
+      // Get the last day of the month
+      const lastDay = new Date(parseInt(year as string), parseInt(month as string), 0).getDate();
+      const endDateStr = `${year}-${paddedMonth}-${lastDay}`;
+
+      query.date = { $gte: startDateStr, $lte: endDateStr };
     }
 
     const records = await Attendance.find(query).sort({ date: -1 });
@@ -109,6 +114,10 @@ export const updateAttendanceRecord = async (req: Request, res: Response) => {
 
     // Now update the attendance after authorization is confirmed
     const attendance = await Attendance.findByIdAndUpdate(attendanceId, updates, { new: true });
+
+    if (!attendance) {
+      return res.status(404).json({ success: false, message: "Attendance record not found" });
+    }
 
     await SystemLog.create({
       userId: req.user.userId,
@@ -227,8 +236,19 @@ export const updateTask = async (req: Request, res: Response) => {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
 
+    // Automatically set completedAt if status is changed to completed
+    if (updates.status === "completed" && existingTask.status !== "completed") {
+      updates.completedAt = new Date().toISOString().split("T")[0];
+    } else if (updates.status && updates.status !== "completed") {
+      updates.completedAt = null;
+    }
+
     // Now update the task after authorization is confirmed
     const task = await Task.findByIdAndUpdate(taskId, updates, { new: true });
+
+    if (!task) {
+      return res.status(404).json({ success: false, message: "Task not found" });
+    }
 
     await SystemLog.create({
       userId: req.user.userId,
@@ -376,11 +396,15 @@ export const updateAppraisal = async (req: Request, res: Response) => {
       appraisalId,
       {
         ...updates,
-        hrReviewedBy: req.user.name || req.user.email,
+        hrReviewedBy: (req.user as any).name || req.user.email,
         hrReviewedAt: new Date(),
       },
       { new: true }
     );
+
+    if (!appraisal) {
+      return res.status(404).json({ success: false, message: "Appraisal not found" });
+    }
 
     await SystemLog.create({
       userId: req.user.userId,
@@ -583,10 +607,10 @@ export const generateMonthlyAppraisals = async (req: Request, res: Response) => 
         const attendanceScore =
           attendanceRecords.length > 0
             ? Math.round(
-                ((attendanceRecords.filter(r => r.status === "present" || r.status === "late").length /
-                  attendanceRecords.length) *
-                  100) as any
-              )
+              ((attendanceRecords.filter(r => r.status === "present" || r.status === "late").length /
+                attendanceRecords.length) *
+                100) as any
+            )
             : 0;
 
         const completedTasks = taskRecords.filter(t => t.status === "completed").length;
