@@ -67,6 +67,7 @@ const adminNav: NavItem[] = [
   { label: "Departments", href: "/admin/departments", icon: <Building2 className="h-5 w-5" /> },
   { label: "Reports", href: "/admin/reports", icon: <FileText className="h-5 w-5" /> },
   { label: "Calendar", href: "/admin/calendar", icon: <Calendar className="h-5 w-5" /> },
+  { label: "Daily Reports", href: "/hr/daily-reports", icon: <Activity className="h-5 w-5" /> },
   { label: "Settings", href: "/admin/settings", icon: <Settings className="h-5 w-5" /> },
   { label: "Security", href: "/admin/security", icon: <Shield className="h-5 w-5" /> },
 ];

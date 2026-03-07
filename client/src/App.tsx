@@ -75,7 +75,7 @@ const App = () => (
             <Route path="/hr/employees" element={<ProtectedRoute allowedRoles={["hr_manager"]}><HREmployees /></ProtectedRoute>} />
             <Route path="/hr/reports" element={<ProtectedRoute allowedRoles={["hr_manager"]}><HRReports /></ProtectedRoute>} />
             <Route path="/hr/appraisals" element={<ProtectedRoute allowedRoles={["hr_manager"]}><HRAppraisals /></ProtectedRoute>} />
-            <Route path="/hr/daily-reports" element={<ProtectedRoute allowedRoles={["hr_manager"]}><HRDailyReports /></ProtectedRoute>} />
+            <Route path="/hr/daily-reports" element={<ProtectedRoute allowedRoles={["hr_manager", "admin_staff"]}><HRDailyReports /></ProtectedRoute>} />
             <Route path="/hr/calendar" element={<ProtectedRoute allowedRoles={["hr_manager"]}><HRCalendar /></ProtectedRoute>} />
 
             {/* Admin Staff Routes */}

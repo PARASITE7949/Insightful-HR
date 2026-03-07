@@ -23,6 +23,7 @@ export async function calculateRealTimePerformance(
   workingHours: number;
   tasksCompleted: number;
   tasksPending: number;
+  attendanceStatus?: string;
 }> {
   // Get today's attendance
   const todayAttendance = await Attendance.findOne({
@@ -38,13 +39,13 @@ export async function calculateRealTimePerformance(
 
   if (todayAttendance) {
     attendanceScore = todayAttendance.status === "present" ? 100 : todayAttendance.status === "late" ? 75 : 0;
-    
+
     // Punctuality: check if check-in was on time (before 9:30 AM)
     if (todayAttendance.checkIn) {
       const [hours, minutes] = todayAttendance.checkIn.split(":").map(Number);
       const checkInTime = hours * 60 + minutes;
       const expectedTime = 9 * 60 + 30; // 9:30 AM
-      
+
       if (checkInTime <= expectedTime) {
         punctualityScore = 100;
       } else if (checkInTime <= expectedTime + 30) {
@@ -72,7 +73,7 @@ export async function calculateRealTimePerformance(
   const totalTasks = todayTasks.length;
 
   // Task completion score
-  const taskCompletionScore = totalTasks > 0 
+  const taskCompletionScore = totalTasks > 0
     ? Math.round((tasksCompleted / totalTasks) * 100)
     : 75; // Default if no tasks
 
@@ -104,6 +105,7 @@ export async function calculateRealTimePerformance(
     workingHours,
     tasksCompleted,
     tasksPending,
+    attendanceStatus: todayAttendance?.status || "absent",
   };
 }
 
@@ -117,7 +119,7 @@ export const generateDailyReport = async (req: Request, res: Response) => {
     }
 
     const { userId } = req.params;
-    const { date } = req.body;
+    const { date, isHalfDay } = req.body;
 
     const user = await User.findById(userId);
     if (!user || user.companyId !== req.user.companyId) {
@@ -125,6 +127,41 @@ export const generateDailyReport = async (req: Request, res: Response) => {
     }
 
     const reportDate = date || new Date().toISOString().split("T")[0];
+
+    // If isHalfDay is true, handle early checkout and mark as half-day
+    if (isHalfDay) {
+      const attendance = await Attendance.findOne({
+        userId,
+        companyId: req.user.companyId,
+        date: reportDate,
+      });
+
+      if (attendance && attendance.checkIn && !attendance.checkOut) {
+        const now = new Date();
+        const hh = now.getHours().toString().padStart(2, "0");
+        const mm = now.getMinutes().toString().padStart(2, "0");
+        const checkOut = `${hh}:${mm}`;
+
+        const [inH, inM] = attendance.checkIn.split(":").map(Number);
+        const hours = Math.round(((now.getHours() * 60 + now.getMinutes()) - (inH * 60 + inM)) / 60 * 100) / 100;
+
+        await Attendance.findByIdAndUpdate(attendance._id, {
+          checkOut,
+          status: "half-day",
+          workingHours: hours,
+        });
+
+        // Log the early checkout
+        await SystemLog.create({
+          userId,
+          companyId: req.user.companyId,
+          action: "ATTENDANCE_HALF_DAY",
+          resource: "Attendance",
+          description: `User checked out early for half-day at ${checkOut}`,
+          ipAddress: req.ip,
+        });
+      }
+    }
 
     // Check if report already exists
     const existingReport = await DailyReport.findOne({
@@ -141,15 +178,17 @@ export const generateDailyReport = async (req: Request, res: Response) => {
       });
     }
 
-    // Calculate real-time performance
+    // Refresh performance data after potential attendance update
     const performance = await calculateRealTimePerformance(
       userId,
       req.user.companyId,
       reportDate
     );
 
-    // Check if 8 hours completed
-    if (performance.workingHours < 8) {
+    // Check if 8 hours completed (except for half-day)
+    const isActuallyHalfDay = performance.attendanceStatus === "half-day" || isHalfDay;
+
+    if (performance.workingHours < 8 && !isActuallyHalfDay) {
       return res.status(400).json({
         success: false,
         message: `Only ${performance.workingHours.toFixed(1)} hours completed. Minimum 8 hours required.`,
@@ -158,7 +197,8 @@ export const generateDailyReport = async (req: Request, res: Response) => {
     }
 
     // Create or update daily report
-    const summary = `Completed ${performance.tasksCompleted} tasks, ${performance.workingHours.toFixed(1)}h worked. Performance: ${performance.overallScore}%`;
+    const summaryAction = isActuallyHalfDay ? "Half-day worked" : "Full-day worked";
+    const summary = `${summaryAction}. Completed ${performance.tasksCompleted} tasks, ${performance.workingHours.toFixed(1)}h worked. Performance: ${performance.overallScore}%`;
 
     let dailyReport;
     if (existingReport) {
@@ -256,7 +296,7 @@ export const getDailyReport = async (req: Request, res: Response) => {
         req.user.companyId,
         reportDate
       );
-      
+
       report = {
         _id: uuidv4(),
         userId,
@@ -344,14 +384,21 @@ export const replyToDailyReport = async (req: Request, res: Response) => {
       status: "reviewed",
     };
 
-    if (replyType === "manager" || req.user.role === "admin_staff") {
+    if (replyType === "manager") {
       updateData.managerReply = reply;
       updateData.managerRepliedAt = new Date();
-    }
-
-    if (replyType === "hr" || req.user.role === "hr_manager") {
+    } else if (replyType === "hr") {
       updateData.hrReply = reply;
       updateData.hrRepliedAt = new Date();
+    } else {
+      // Default behavior if replyType is not specified
+      if (req.user.role === "admin_staff") {
+        updateData.managerReply = reply;
+        updateData.managerRepliedAt = new Date();
+      } else if (req.user.role === "hr_manager") {
+        updateData.hrReply = reply;
+        updateData.hrRepliedAt = new Date();
+      }
     }
 
     const updatedReport = await DailyReport.findByIdAndUpdate(reportId, updateData, { new: true });

@@ -45,6 +45,25 @@ class ApiClient {
         };
       }
 
+      // Handle unauthorized (401) - Clear token and redirect to login
+      if (response.status === 401) {
+        localStorage.removeItem("authToken");
+        // Don't redirect if we're already on an auth page
+        const isAuthPage = window.location.pathname.includes("/login") ||
+          window.location.pathname.includes("/register") ||
+          window.location.pathname === "/";
+
+        if (!isAuthPage) {
+          window.location.href = "/login";
+        }
+
+        return {
+          success: false,
+          message: "Session expired. Please login again.",
+          data: null as any,
+        };
+      }
+
       // Try to parse JSON, but handle non-JSON responses
       let data;
       const contentType = response.headers.get("content-type");
@@ -271,10 +290,10 @@ class ApiClient {
   }
 
   // Daily Report endpoints
-  async generateDailyReport(userId: string, date?: string): Promise<ApiResponse> {
+  async generateDailyReport(userId: string, date?: string, isHalfDay: boolean = false): Promise<ApiResponse> {
     return this.request(`/users/${userId}/daily-report`, {
       method: "POST",
-      body: JSON.stringify({ date }),
+      body: JSON.stringify({ date, isHalfDay }),
     });
   }
 

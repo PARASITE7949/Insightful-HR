@@ -7,7 +7,7 @@ A comprehensive Human Resources management system with React frontend and Node.j
 ```
 insightful-hr-main/
 │
-├── client/                          # 🎨 React Frontend (Vite)
+├── client/                          #  React Frontend (Vite)
 │   ├── src/
 │   │   ├── components/             # React components
 │   │   ├── contexts/               # Auth context
@@ -348,14 +348,24 @@ Built with ❤️ for HR Management
 4. Monitor and maintain
 
 **Questions?** Check the relevant documentation or see [Troubleshooting](docs/TESTING.md#troubleshooting).
-#   I n s i g h t f u l - H R  
- #   I n s i g h t f u l - H R  
- #   I n s i g h t f u l - H R  
- #   I n s i g h t f u l - H R  
- #   I n s i g h t f u l - H R  
- #   I n s i g h t f u l - H R  
- #   I n s i g h t f u l - H R  
- #   I n s i g h t f u l - H R  
- #   I n s i g h t f u l - H R  
- #   I n s i g h t f u l - H R  
+#   I n s i g h t f u l - H R 
+ 
+ #   I n s i g h t f u l - H R 
+ 
+ #   I n s i g h t f u l - H R 
+ 
+ #   I n s i g h t f u l - H R 
+ 
+ #   I n s i g h t f u l - H R 
+ 
+ #   I n s i g h t f u l - H R 
+ 
+ #   I n s i g h t f u l - H R 
+ 
+ #   I n s i g h t f u l - H R 
+ 
+ #   I n s i g h t f u l - H R 
+ 
+ #   I n s i g h t f u l - H R 
+ 
  

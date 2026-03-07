@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import apiClient from "@/lib/apiClient";
-import { Clock, CheckCircle, AlertCircle, Send, MessageSquare } from "lucide-react";
+import { Clock, CheckCircle, AlertCircle, Send, MessageSquare, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -47,14 +47,16 @@ export default function DailyReport() {
     return () => clearInterval(interval);
   }, [user]);
 
-  const handleSubmitReport = async () => {
+  const handleSubmitReport = async (isHalfDay: boolean = false) => {
     if (!user) return;
     setIsSubmitting(true);
     try {
       const today = new Date().toISOString().split("T")[0];
-      const response = await apiClient.generateDailyReport(user.id, today);
+      const response = await apiClient.generateDailyReport(user.id, today, isHalfDay);
       if (response.success) {
-        toast.success("Daily report submitted! Managers and HR have been notified.");
+        toast.success(isHalfDay
+          ? "Half-day report submitted! You have been checked out."
+          : "Daily report submitted! Managers and HR have been notified.");
         setDailyReport(response.data);
       } else {
         toast.error(response.message || "Failed to submit report");
@@ -81,7 +83,9 @@ export default function DailyReport() {
     );
   }
 
-  const canSubmit = performance && performance.workingHours >= 8 && dailyReport?.status !== "submitted";
+  const isHalfDay = performance?.attendanceStatus === "half-day";
+  const canSubmit = performance && (performance.workingHours >= 8 || isHalfDay) && dailyReport?.status !== "submitted";
+  const canSubmitHalfDay = performance && performance.workingHours < 8 && !isHalfDay && dailyReport?.status !== "submitted";
 
   const getPerformanceBadge = (score: number) => {
     if (score >= 90) return { label: "Excellent", variant: "default" as const, icon: CheckCircle };
@@ -206,7 +210,7 @@ export default function DailyReport() {
           <CardHeader>
             <CardTitle>Submit Daily Report</CardTitle>
             <CardDescription>
-              Submit your daily report after completing 8 working hours. Managers and HR will be notified via SMS.
+              Submit your daily report after completing 8 working hours (or early if taking a half day). Managers and HR will be notified via SMS.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -254,28 +258,43 @@ export default function DailyReport() {
               <div className="space-y-4">
                 <div className="p-4 rounded-lg bg-muted/50">
                   <p className="text-sm">
-                    <strong>Current Status:</strong> {performance?.workingHours >= 8 ? "Ready to submit" : "Working hours not met"}
+                    <strong>Current Status:</strong> {performance?.workingHours >= 8 ? "Ready to submit" : isHalfDay ? "Half Day (Ready to submit)" : "Working hours not met"}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {performance?.workingHours >= 8
-                      ? "You have completed the minimum 8 working hours. Click below to submit your daily report."
-                      : `You need ${(8 - (performance?.workingHours || 0)).toFixed(1)} more hours to submit.`}
+                    {performance?.workingHours >= 8 || isHalfDay
+                      ? "You can now submit your daily report."
+                      : `You need ${(8 - (performance?.workingHours || 0)).toFixed(1)} more hours for a full day.`}
                   </p>
                 </div>
-                <Button
-                  onClick={handleSubmitReport}
-                  disabled={!canSubmit || isSubmitting}
-                  className="w-full"
-                  size="lg"
-                >
-                  <Send className="h-4 w-4 mr-2" />
-                  {isSubmitting ? "Submitting..." : "Submit Daily Report"}
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    onClick={() => handleSubmitReport(false)}
+                    disabled={!canSubmit || isSubmitting}
+                    className="flex-1"
+                    size="lg"
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    {isSubmitting ? "Submitting..." : "Submit Full Day Report"}
+                  </Button>
+
+                  {canSubmitHalfDay && (
+                    <Button
+                      onClick={() => handleSubmitReport(true)}
+                      disabled={isSubmitting}
+                      variant="outline"
+                      className="flex-1 border-orange-200 hover:bg-orange-50 hover:text-orange-900"
+                      size="lg"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      {isSubmitting ? "Submitting..." : "Submit as Half Day"}
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
+    </DashboardLayout >
   );
 }
