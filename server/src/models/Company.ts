@@ -1,7 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { ICompany } from "@/types";
 
-interface CompanyDocument extends ICompany, Document {}
+interface CompanyDocument extends ICompany, Omit<Document, "_id"> {
+  _id: string;
+}
 
 const companySchema = new Schema<CompanyDocument>(
   {

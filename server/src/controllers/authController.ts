@@ -204,6 +204,7 @@ export const login = async (req: Request, res: Response) => {
     const token = generateToken({
       userId: user._id,
       email: user.email,
+      name: user.name,
       role: user.role,
       companyId: user.companyId,
     });

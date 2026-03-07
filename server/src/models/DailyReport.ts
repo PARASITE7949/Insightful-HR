@@ -98,13 +98,13 @@ const dailyReportSchema = new Schema<DailyReportDocument>(
     },
     responses: [
       {
-        userId: String,
-        userName: String,
+        userId: { type: String },
+        userName: { type: String },
         userRole: {
           type: String,
           enum: ["hr_manager", "admin_staff"],
         },
-        message: String,
+        message: { type: String },
         timestamp: {
           type: Date,
           default: Date.now,

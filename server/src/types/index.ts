@@ -80,6 +80,7 @@ export interface ISystemLog {
 export interface AuthPayload {
   userId: string;
   email: string;
+  name: string;
   role: UserRole;
   companyId: string;
 }
