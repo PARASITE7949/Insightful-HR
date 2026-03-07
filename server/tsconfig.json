@@ -1,4 +1,5 @@
 {
+  "display": "Insightful HR Backend",
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
