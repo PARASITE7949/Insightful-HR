@@ -1,10 +1,15 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { IAppraisalReport } from "@/types";
 
-interface AppraisalDocument extends IAppraisalReport, Document {}
+interface AppraisalDocument extends IAppraisalReport, Omit<Document, "_id"> {
+  _id: string;
+}
 
 const appraisalSchema = new Schema<AppraisalDocument>(
   {
+    _id: {
+      type: String,
+    },
     userId: {
       type: String,
       required: [true, "User ID is required"],
@@ -67,10 +72,10 @@ const appraisalSchema = new Schema<AppraisalDocument>(
       enum: ["exceptional", "exceeds-expectations", "meets-expectations", "needs-improvement", "unsatisfactory"],
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: {
-      transform: function(doc: any, ret: any) {
+      transform: function (doc: any, ret: any) {
         ret.id = ret._id;
         return ret;
       }

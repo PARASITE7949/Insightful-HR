@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface HolidayDocument extends Document {
+interface HolidayDocument extends Omit<Document, "_id"> {
   _id: string;
   companyId: string;
   date: string; // YYYY-MM-DD format

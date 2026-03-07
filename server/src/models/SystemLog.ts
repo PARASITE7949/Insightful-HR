@@ -1,10 +1,15 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { ISystemLog } from "@/types";
 
-interface LogDocument extends ISystemLog, Document {}
+interface LogDocument extends ISystemLog, Omit<Document, "_id"> {
+  _id: string;
+}
 
 const logSchema = new Schema<LogDocument>(
   {
+    _id: {
+      type: String,
+    },
     userId: {
       type: String,
       required: [true, "User ID is required"],

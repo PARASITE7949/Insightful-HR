@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface DailyReportDocument extends Document {
+interface DailyReportDocument extends Omit<Document, "_id"> {
   _id: string;
   userId: string;
   companyId: string;

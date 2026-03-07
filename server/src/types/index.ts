@@ -11,6 +11,9 @@ export interface IUser {
   email: string;
   phone?: string;
   phoneVerified?: boolean;
+  otpPhone?: string;
+  otpPhoneExpiresAt?: Date;
+  approvedByAdmin?: boolean;
   name: string;
   password: string;
   role: UserRole;

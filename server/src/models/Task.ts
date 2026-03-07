@@ -1,7 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { ITask } from "@/types";
 
-interface TaskDocument extends ITask, Document {}
+interface TaskDocument extends ITask, Omit<Document, "_id"> {
+  _id: string;
+}
 
 const taskSchema = new Schema<TaskDocument>(
   {
@@ -49,10 +51,10 @@ const taskSchema = new Schema<TaskDocument>(
       type: String,
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: {
-      transform: function(doc: any, ret: any) {
+      transform: function (doc: any, ret: any) {
         ret.id = ret._id;
         return ret;
       }

@@ -1,7 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { IUser } from "@/types";
 
-interface UserDocument extends IUser, Document {}
+interface UserDocument extends IUser, Omit<Document, "_id"> {
+  _id: string;
+}
 
 const userSchema = new Schema<UserDocument>(
   {
@@ -84,10 +86,10 @@ const userSchema = new Schema<UserDocument>(
       default: true,
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: {
-      transform: function(doc: any, ret: any) {
+      transform: function (doc: any, ret: any) {
         ret.id = ret._id;
         return ret;
       }

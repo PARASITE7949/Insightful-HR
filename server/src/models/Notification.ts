@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface NotificationDocument extends Document {
+interface NotificationDocument extends Omit<Document, "_id"> {
   _id: string;
   companyId: string;
   userId?: string; // If empty, it's for all users in company
