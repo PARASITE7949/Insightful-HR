@@ -19,18 +19,6 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "types": [
-      "node",
-      "express",
-      "cors",
-      "morgan",
-      "uuid",
-      "bcryptjs",
-      "jsonwebtoken"
-    ],
     "paths": {
       "@/*": [
         "src/*"
