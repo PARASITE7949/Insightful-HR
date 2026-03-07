@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 import { ITask } from "@/types";
 
 interface TaskDocument extends ITask, Omit<Document, "_id"> {
@@ -9,6 +10,7 @@ const taskSchema = new Schema<TaskDocument>(
   {
     _id: {
       type: String,
+      default: uuidv4,
     },
     userId: {
       type: String,

@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 
 interface HolidayDocument extends Omit<Document, "_id"> {
   _id: string;
@@ -18,6 +19,7 @@ const holidaySchema = new Schema<HolidayDocument>(
   {
     _id: {
       type: String,
+      default: uuidv4,
     },
     companyId: {
       type: String,

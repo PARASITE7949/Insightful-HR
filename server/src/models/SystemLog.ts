@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 import { ISystemLog } from "@/types";
 
 interface LogDocument extends ISystemLog, Omit<Document, "_id"> {
@@ -9,6 +10,7 @@ const logSchema = new Schema<LogDocument>(
   {
     _id: {
       type: String,
+      default: uuidv4,
     },
     userId: {
       type: String,

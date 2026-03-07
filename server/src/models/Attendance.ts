@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 import { IAttendanceRecord } from "@/types";
 
 interface AttendanceDocument extends IAttendanceRecord, Omit<Document, "_id"> {
@@ -9,6 +10,7 @@ const attendanceSchema = new Schema<AttendanceDocument>(
   {
     _id: {
       type: String,
+      default: uuidv4,
     },
     userId: {
       type: String,

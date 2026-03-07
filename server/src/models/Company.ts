@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 import { ICompany } from "@/types";
 
 interface CompanyDocument extends ICompany, Omit<Document, "_id"> {
@@ -9,6 +10,7 @@ const companySchema = new Schema<CompanyDocument>(
   {
     _id: {
       type: String,
+      default: uuidv4,
     },
     name: {
       type: String,
