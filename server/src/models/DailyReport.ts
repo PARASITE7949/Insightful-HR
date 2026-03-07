@@ -15,7 +15,14 @@ interface DailyReportDocument extends Omit<Document, "_id"> {
   tasksCompleted: number;
   tasksPending: number;
   summary: string;
-  status: "pending" | "submitted" | "reviewed";
+  status: "pending" | "submitted" | "acknowledged" | "reviewed";
+  responses: Array<{
+    userId: string;
+    userName: string;
+    userRole: "hr_manager" | "admin_staff";
+    message: string;
+    timestamp: Date;
+  }>;
   submittedAt?: Date;
   managerReply?: string;
   hrReply?: string;
@@ -86,9 +93,24 @@ const dailyReportSchema = new Schema<DailyReportDocument>(
     },
     status: {
       type: String,
-      enum: ["pending", "submitted", "reviewed"],
+      enum: ["pending", "submitted", "acknowledged", "reviewed"],
       default: "pending",
     },
+    responses: [
+      {
+        userId: String,
+        userName: String,
+        userRole: {
+          type: String,
+          enum: ["hr_manager", "admin_staff"],
+        },
+        message: String,
+        timestamp: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     submittedAt: {
       type: Date,
     },

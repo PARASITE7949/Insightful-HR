@@ -1,4 +1,4 @@
-import express, { Express } from "express";
+import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -21,10 +21,10 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
-const frontendOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "http://localhost:8080").split(",").map(s => s.trim());
+const frontendOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "http://localhost:8080").split(",").map((s: string) => s.trim());
 
 app.use(cors({
-  origin: (origin, callback) => {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     // Allow non-browser requests like curl/postman (no origin)
     if (!origin) return callback(null, true);
     if (frontendOrigins.includes(origin)) return callback(null, true);
@@ -50,7 +50,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Health check
-app.get("/health", (req, res) => {
+app.get("/health", (req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
 
@@ -66,7 +66,7 @@ app.get("/api/system-logs", authMiddleware, getSystemLogs);
 app.use(errorHandler);
 
 // 404 handler
-app.use((req, res) => {
+app.use((req: Request, res: Response) => {
   res.status(404).json({ success: false, message: "Route not found" });
 });
 

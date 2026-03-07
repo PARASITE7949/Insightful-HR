@@ -3,7 +3,8 @@
     "target": "ES2020",
     "module": "ESNext",
     "lib": [
-      "ESNext"
+      "ESNext",
+      "DOM"
     ],
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -18,6 +19,10 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./",
+    "types": [
+      "node",
+      "express"
+    ],
     "paths": {
       "@/*": [
         "src/*"
