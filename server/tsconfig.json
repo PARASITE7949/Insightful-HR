@@ -19,10 +19,6 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./",
-    "types": [
-      "node",
-      "express"
-    ],
     "paths": {
       "@/*": [
         "src/*"
