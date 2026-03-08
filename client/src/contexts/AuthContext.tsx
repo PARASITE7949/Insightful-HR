@@ -7,17 +7,15 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (userData: { 
-    name: string; 
-    email: string; 
+  register: (userData: {
+    name: string;
+    email: string;
     phone?: string;
-    role: UserRole; 
-    department: string; 
-    position: string; 
+    role: UserRole;
+    department: string;
+    position: string;
     password: string;
-    otp: string;
   }) => Promise<boolean>;
-  requestOTP: (email: string) => Promise<boolean>;
   logout: () => void;
   setAuthUser: (user: User) => void;
   hasCompanyRegistered: boolean;
@@ -68,21 +66,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const requestOTP = async (email: string): Promise<boolean> => {
-    try {
-      const response = await apiClient.requestOTP(email);
-      if (response.success) {
-        toast.success("OTP sent to your email");
-        return true;
-      } else {
-        toast.error(response.message);
-        return false;
-      }
-    } catch (error: any) {
-      toast.error(error.message);
-      return false;
-    }
-  };
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -95,14 +78,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: response.data.user.email,
           name: response.data.user.name,
           phone: response.data.user.phone,
-            role: response.data.user.role,
+          role: response.data.user.role,
           department: response.data.user.department,
           position: response.data.user.position,
           isActive: true,
           joinDate: new Date().toISOString().split("T")[0],
-            verified: response.data.user.verified || false,
-            approvedBy: response.data.user.approvedBy || null,
-            approvedAt: response.data.user.approvedAt || null,
+          verified: response.data.user.verified || false,
+          approvedBy: response.data.user.approvedBy || null,
+          approvedAt: response.data.user.approvedAt || null,
         };
 
         setUser(userData);
@@ -128,7 +111,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     department: string;
     position: string;
     password: string;
-    otp: string;
   }): Promise<boolean> => {
     try {
       const response = await apiClient.register({
@@ -139,7 +121,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: userData.role,
         department: userData.department,
         position: userData.position,
-        otp: userData.otp,
       });
 
       if (response.success && response.data) {
@@ -189,7 +170,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         login,
         register,
-        requestOTP,
         logout,
         setAuthUser,
         hasCompanyRegistered,

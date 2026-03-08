@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Building2, User, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Register() {
@@ -27,7 +28,7 @@ export default function Register() {
   const navigate = useNavigate();
 
   const departments = ["Engineering", "Marketing", "Sales", "Human Resources", "Finance", "Operations", "Administration"];
-  
+
   const positions: Record<UserRole, string[]> = {
     employee: ["Software Developer", "Marketing Specialist", "Sales Representative", "Analyst", "Designer", "Engineer"],
     hr_manager: ["HR Manager", "HR Director", "Recruitment Head", "HR Business Partner"],
@@ -45,7 +46,7 @@ export default function Register() {
       toast.error("Phone number must be exactly 10 digits");
       return;
     }
-    
+
     setIsLoading(true);
     const success = await register({
       name: formData.name,
@@ -100,109 +101,161 @@ export default function Register() {
         <div className="w-full max-w-md">
           <Card className="border-0 shadow-xl">
             <CardHeader className="text-center pb-2">
-              <CardTitle className="text-2xl">
-                {step === "form" ? "Create Account" : "Pending Approval"}
-              </CardTitle>
-              <CardDescription>
-                {step === "form" ? "Use your company email to register" : "Awaiting super admin approval"}
-              </CardDescription>
+              <CardTitle className="text-2xl font-bold">Registration</CardTitle>
+              <CardDescription>Join our platform as an organization or individual</CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
-              {step === "form" ? (
-                <form onSubmit={handleFormSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" placeholder="Enter your full name" value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Company Email</Label>
-                    <Input id="email" type="email" placeholder="you@company.com" value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
-                    <p className="text-xs text-muted-foreground">Must match your company's registered domain</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" type="tel" placeholder="9876543210" maxLength={10} value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} required />
-                    <p className="text-xs text-muted-foreground">10-digit phone number</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="password">Password</Label>
-                      <Input id="password" type="password" placeholder="Password" value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
+              <Tabs defaultValue="member" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="member" className="gap-2">
+                    <User className="h-4 w-4" /> Member
+                  </TabsTrigger>
+                  <TabsTrigger value="company" className="gap-2">
+                    <Building2 className="h-4 w-4" /> Company
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="member">
+                  {step === "form" ? (
+                    <div className="space-y-4">
+                      <div className="text-center mb-4">
+                        <h3 className="text-lg font-semibold">Join a Company</h3>
+                        <p className="text-sm text-muted-foreground">Create your account using your company email</p>
+                      </div>
+                      <form onSubmit={handleFormSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Full Name</Label>
+                          <Input id="name" placeholder="Enter your full name" value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Company Email</Label>
+                          <Input id="email" type="email" placeholder="you@company.com" value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
+                          <p className="text-xs text-muted-foreground text-blue-600 bg-blue-50 p-2 rounded">
+                            Note: Your email domain must match your company's registered domain for verification.
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Phone Number</Label>
+                          <Input id="phone" type="tel" placeholder="9876543210" maxLength={10} value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} required />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="password">Password</Label>
+                            <Input id="password" type="password" placeholder="••••••••" value={formData.password}
+                              onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="confirmPassword">Confirm</Label>
+                            <Input id="confirmPassword" type="password" placeholder="••••••••" value={formData.confirmPassword}
+                              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} required />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Role</Label>
+                          <Select value={formData.role}
+                            onValueChange={(value: UserRole) => setFormData({ ...formData, role: value, position: "" })}>
+                            <SelectTrigger><SelectValue placeholder="Select role" /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="employee">Employee</SelectItem>
+                              <SelectItem value="hr_manager">HR Manager</SelectItem>
+                              <SelectItem value="admin_staff">Admin Staff</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Department</Label>
+                            <Select value={formData.department}
+                              onValueChange={(value) => setFormData({ ...formData, department: value })}>
+                              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                              <SelectContent>
+                                {departments.map((dept) => (
+                                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Position</Label>
+                            <Select value={formData.position}
+                              onValueChange={(value) => setFormData({ ...formData, position: value })}>
+                              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                              <SelectContent>
+                                {positions[formData.role]?.map((pos) => (
+                                  <SelectItem key={pos} value={pos}>{pos}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <Button type="submit" className="w-full" disabled={isLoading}>
+                          {isLoading ? "Registering..." : "Create Member Account"}
+                        </Button>
+                      </form>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Confirm</Label>
-                      <Input id="confirmPassword" type="password" placeholder="Confirm" value={formData.confirmPassword}
-                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} required />
+                  ) : (
+                    <div className="space-y-6 text-center">
+                      <div className="flex justify-center">
+                        <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
+                          <Building2 className="h-8 w-8 text-green-600" />
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold">Registration Successful!</h3>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Your account has been created. Your system admin will review and approve your access shortly.
+                        </p>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-4 text-sm text-left space-y-2">
+                        <p><strong>Name:</strong> {formData.name}</p>
+                        <p><strong>Email:</strong> {formData.email}</p>
+                        <p><strong>Role:</strong> {formData.role.replace(/_/g, " ")}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        You will be redirected shortly...
+                      </p>
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Role</Label>
-                    <Select value={formData.role}
-                      onValueChange={(value: UserRole) => setFormData({ ...formData, role: value, position: "" })}>
-                      <SelectTrigger><SelectValue placeholder="Select role" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="employee">Employee</SelectItem>
-                        <SelectItem value="hr_manager">HR Manager</SelectItem>
-                        <SelectItem value="admin_staff">Admin Staff</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Department</Label>
-                    <Select value={formData.department}
-                      onValueChange={(value) => setFormData({ ...formData, department: value })}>
-                      <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
-                      <SelectContent>
-                        {departments.map((dept) => (
-                          <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Position</Label>
-                    <Select value={formData.position}
-                      onValueChange={(value) => setFormData({ ...formData, position: value })}>
-                      <SelectTrigger><SelectValue placeholder="Select position" /></SelectTrigger>
-                      <SelectContent>
-                        {positions[formData.role]?.map((pos) => (
-                          <SelectItem key={pos} value={pos}>{pos}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Registering..." : "Create Account"}
-                  </Button>
-                </form>
-              ) : (
-                <div className="space-y-6 text-center">
-                  <div className="flex justify-center">
-                    <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
-                      <Building2 className="h-8 w-8 text-green-600" />
+                  )}
+                </TabsContent>
+
+                <TabsContent value="company" className="space-y-6">
+                  <div className="text-center space-y-4">
+                    <div className="flex justify-center">
+                      <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Building2 className="h-8 w-8 text-primary" />
+                      </div>
                     </div>
+                    <div>
+                      <h3 className="text-xl font-bold">Register Your Organization</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Set up a new workspace for your entire company and manage your team efficiently.
+                      </p>
+                    </div>
+                    <ul className="text-sm text-left space-y-2 bg-muted/30 p-4 rounded-lg">
+                      <li className="flex items-center gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        Complete admin control panel
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        Employee performance tracking
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        Attendance & leave management
+                      </li>
+                    </ul>
+                    <Link to="/company-register" className="block w-full">
+                      <Button className="w-full gap-2">
+                        Start Company Registration <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold">Registration Successful!</h3>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Your account has been created. Your super admin will review and approve your account shortly.
-                    </p>
-                  </div>
-                  <div className="bg-muted/50 rounded-lg p-4 text-sm text-left space-y-2">
-                    <p><strong>Name:</strong> {formData.name}</p>
-                    <p><strong>Email:</strong> {formData.email}</p>
-                    <p><strong>Role:</strong> {formData.role.replace(/_/g, " ")}</p>
-                    <p><strong>Phone:</strong> {formData.phone}</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    You will be redirected to login page shortly...
-                  </p>
-                </div>
-              )}
+                </TabsContent>
+              </Tabs>
             </CardContent>
             <CardFooter className="flex-col gap-4 text-center">
               <p className="text-sm text-muted-foreground">

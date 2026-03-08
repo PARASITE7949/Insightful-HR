@@ -63,7 +63,7 @@ export default function Login() {
           </div>
           <h1 className="mb-4 text-4xl font-bold">Employee Appraisal System</h1>
           <p className="text-lg opacity-90">
-            AI-powered performance evaluation platform for modern organizations. 
+            AI-powered performance evaluation platform for modern organizations.
             Streamline your HR processes with intelligent analytics.
           </p>
         </div>
@@ -81,35 +81,43 @@ export default function Login() {
 
           <Card className="border-0 shadow-xl">
             <CardHeader className="text-center pb-2">
-              <CardTitle className="text-2xl">Welcome Back</CardTitle>
-              <CardDescription>Sign in to access your dashboard</CardDescription>
+              <CardTitle className="text-2xl">Authentication</CardTitle>
+              <CardDescription>Select your login type to continue</CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
-              <Tabs defaultValue="login" className="w-full">
+              <Tabs defaultValue="employee" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="login">Sign In</TabsTrigger>
-                  <TabsTrigger value="demo" disabled={!hasCompanyRegistered}>Demo Access</TabsTrigger>
+                  <TabsTrigger value="employee" className="gap-2">
+                    <User className="h-4 w-4" /> Employee
+                  </TabsTrigger>
+                  <TabsTrigger value="company" className="gap-2">
+                    <Building2 className="h-4 w-4" /> Company
+                  </TabsTrigger>
                 </TabsList>
-                
-                <TabsContent value="login">
+
+                <TabsContent value="employee" className="space-y-4">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-semibold">Employee Login</h3>
+                    <p className="text-sm text-muted-foreground">Access your personal dashboard and tasks</p>
+                  </div>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="emp-email">Email</Label>
                       <Input
-                        id="email"
+                        id="emp-email"
                         type="email"
-                        placeholder="Enter your email"
+                        placeholder="employee@company.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="password">Password</Label>
+                      <Label htmlFor="emp-password">Password</Label>
                       <Input
-                        id="password"
+                        id="emp-password"
                         type="password"
-                        placeholder="Enter your password"
+                        placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -121,35 +129,71 @@ export default function Login() {
                       </Link>
                     </div>
                     <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading ? "Signing in..." : "Sign In"}
+                      {isLoading ? "Signing in..." : "Employee Sign In"}
                     </Button>
                   </form>
                 </TabsContent>
-                
-                <TabsContent value="demo">
-                  <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground text-center mb-4">
-                      Click any account to login instantly
+
+                <TabsContent value="company" className="space-y-4">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-semibold">Company Login</h3>
+                    <p className="text-sm text-muted-foreground">Admin & HR Management Portal</p>
+                  </div>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="comp-email">Email</Label>
+                      <Input
+                        id="comp-email"
+                        type="email"
+                        placeholder="admin@company.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="comp-password">Password</Label>
+                      <Input
+                        id="comp-password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                        Forgot Password?
+                      </Link>
+                    </div>
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                      {isLoading ? "Signing in..." : "Company Sign In"}
+                    </Button>
+                  </form>
+                  <div className="mt-6 border-t pt-6">
+                    <p className="text-sm text-muted-foreground text-center mb-4 text-xs font-semibold uppercase tracking-wider">
+                      Demo Accounts
                     </p>
-                    {demoAccounts.map((account) => (
-                      <Button
-                        key={account.email}
-                        variant="outline"
-                        className="w-full justify-start h-auto py-3"
-                        onClick={() => handleDemoLogin(account.email)}
-                        disabled={isLoading}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <div className="grid gap-2">
+                      {demoAccounts.map((account) => (
+                        <Button
+                          key={account.email}
+                          variant="outline"
+                          size="sm"
+                          className="w-full justify-start h-auto py-2"
+                          onClick={() => handleDemoLogin(account.email)}
+                          disabled={isLoading}
+                        >
+                          <div className="flex items-center gap-2">
                             {account.icon}
+                            <div className="text-left">
+                              <div className="text-xs font-medium">{account.role}</div>
+                            </div>
                           </div>
-                          <div className="text-left">
-                            <div className="font-medium">{account.role}</div>
-                            <div className="text-xs text-muted-foreground">{account.email}</div>
-                          </div>
-                        </div>
-                      </Button>
-                    ))}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </TabsContent>
               </Tabs>
