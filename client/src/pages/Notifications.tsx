@@ -23,11 +23,17 @@ export default function Notifications() {
   const [filter, setFilter] = useState<"all" | "unread">("all");
 
   useEffect(() => {
-    fetchAllNotifications();
+    fetchAllNotifications(true);
+
+    // Live update polling
+    const interval = setInterval(() => {
+      fetchAllNotifications(false);
+    }, 15000);
+    return () => clearInterval(interval);
   }, [filter]);
 
-  const fetchAllNotifications = async () => {
-    setIsLoading(true);
+  const fetchAllNotifications = async (showLoader = false) => {
+    if (showLoader) setIsLoading(true);
     try {
       const response = await apiClient.getNotifications(
         100,
@@ -40,9 +46,9 @@ export default function Notifications() {
       }
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
-      toast.error("Failed to load notifications");
+      if (showLoader) toast.error("Failed to load notifications");
     } finally {
-      setIsLoading(false);
+      if (showLoader) setIsLoading(false);
     }
   };
 
@@ -181,11 +187,10 @@ export default function Notifications() {
             {notifications.map((notification) => (
               <div
                 key={notification._id}
-                className={`p-4 rounded-lg border transition-all hover:shadow-md ${
-                  !notification.isRead
+                className={`p-4 rounded-lg border transition-all hover:shadow-md ${!notification.isRead
                     ? "bg-blue-50/50 border-blue-200"
                     : "bg-card border-border"
-                }`}
+                  }`}
               >
                 <div className="flex items-start gap-4">
                   <span className="text-2xl flex-shrink-0">

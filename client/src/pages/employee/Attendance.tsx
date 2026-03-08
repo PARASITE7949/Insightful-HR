@@ -20,21 +20,20 @@ export default function EmployeeAttendance() {
 
   useEffect(() => {
     if (!user) return;
-    const fetchAttendance = async () => {
-      setIsLoading(true);
+    const fetchAttendance = async (showLoader = false) => {
+      if (showLoader) setIsLoading(true);
       try {
         const res = await apiClient.getAttendance(user.id);
         if (res.success && Array.isArray(res.data)) setAttendanceRecords(res.data);
       } catch (e) {
         console.error(e);
-        toast.error("Failed to load attendance");
+        if (showLoader) toast.error("Failed to load attendance");
       } finally {
-        setIsLoading(false);
+        if (showLoader) setIsLoading(false);
       }
     };
-    fetchAttendance();
-    // Auto-refresh every 60 seconds for live updates (reduced frequency to avoid rate limits)
-    const interval = setInterval(fetchAttendance, 60000);
+    fetchAttendance(true);
+    const interval = setInterval(() => fetchAttendance(false), 20000);
     return () => clearInterval(interval);
   }, [user]);
 
@@ -73,7 +72,7 @@ export default function EmployeeAttendance() {
       const mm = now.getMinutes().toString().padStart(2, "0");
       const checkOut = `${hh}:${mm}`;
       const [inH, inM] = (todayRecord.checkIn || "00:00").split(":").map(Number);
-      const hours = Math.round(((now.getHours()*60 + now.getMinutes()) - (inH*60 + inM)) / 60 * 100) / 100;
+      const hours = Math.round(((now.getHours() * 60 + now.getMinutes()) - (inH * 60 + inM)) / 60 * 100) / 100;
       const res = await apiClient.updateAttendance(todayRecord._id || todayRecord.id, { checkOut, workingHours: hours });
       if (res.success) {
         const r = await apiClient.getAttendance(user.id);

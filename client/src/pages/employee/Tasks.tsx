@@ -31,19 +31,18 @@ export default function EmployeeTasks() {
     dueDate: format(new Date(), "yyyy-MM-dd"),
   });
   const [userProjects] = useState<Array<{ id: string; name: string }>>([]);
-  
+
   if (!user) return null;
 
   useEffect(() => {
-    fetchTasks();
-    // Auto-refresh every 60 seconds for live updates (reduced frequency to avoid rate limits)
-    const interval = setInterval(fetchTasks, 60000);
+    fetchTasks(true);
+    const interval = setInterval(() => fetchTasks(false), 20000);
     return () => clearInterval(interval);
   }, [user.id]);
 
-  const fetchTasks = async () => {
+  const fetchTasks = async (showLoader = false) => {
     try {
-      setIsLoading(true);
+      if (showLoader) setIsLoading(true);
       const response = await apiClient.getTasks(user.id);
       if (response.success && Array.isArray(response.data)) {
         setTasks(response.data);
@@ -51,18 +50,18 @@ export default function EmployeeTasks() {
         setTasks([]);
       }
     } catch (error: any) {
-      toast.error("Failed to fetch tasks");
+      if (showLoader) toast.error("Failed to fetch tasks");
       console.error(error);
       setTasks([]);
     } finally {
-      setIsLoading(false);
+      if (showLoader) setIsLoading(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    
+
     try {
       if (editingTask) {
         // Update task
@@ -179,12 +178,12 @@ export default function EmployeeTasks() {
           </Button>
         </div>
       </div>
-      
+
       <div className="flex items-center gap-2 flex-wrap">
         <Badge variant="outline" className="text-xs">{task.project}</Badge>
         <Badge variant={
           task.priority === "high" ? "destructive" :
-          task.priority === "medium" ? "default" : "secondary"
+            task.priority === "medium" ? "default" : "secondary"
         } className="text-xs">
           {task.priority}
         </Badge>
@@ -193,33 +192,31 @@ export default function EmployeeTasks() {
           {format(new Date(task.dueDate), "MMM d")}
         </span>
       </div>
-      
+
       <div className="flex gap-2">
         {task.status !== "pending" && task.status !== "completed" && (
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             variant="outline"
             onClick={() => handleStatusChange(task.id, "pending")}
-            disabled={task.status === "completed"}
           >
             <Circle className="h-3 w-3 mr-1" />
             Pending
           </Button>
         )}
         {task.status !== "in-progress" && task.status !== "completed" && (
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             variant="outline"
             onClick={() => handleStatusChange(task.id, "in-progress")}
-            disabled={task.status === "completed"}
           >
             <Clock className="h-3 w-3 mr-1" />
             In Progress
           </Button>
         )}
         {task.status !== "completed" && (
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             variant="default"
             onClick={() => handleStatusChange(task.id, "completed")}
           >
@@ -398,7 +395,7 @@ export default function EmployeeTasks() {
             <TabsTrigger value="in-progress">In Progress ({inProgressTasks.length})</TabsTrigger>
             <TabsTrigger value="completed">Completed ({completedTasks.length})</TabsTrigger>
           </TabsList>
-          
+
           {isLoading && (
             <Card className="mt-4">
               <CardContent className="py-12 text-center">
@@ -409,40 +406,40 @@ export default function EmployeeTasks() {
           )}
 
           {!isLoading && (
-          <>
-          <TabsContent value="all" className="mt-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {tasks.length > 0 ? (
-                tasks.map((task) => <TaskCard key={task.id} task={task} />)
-              ) : (
-                <Card className="col-span-full">
-                  <CardContent className="py-12 text-center">
-                    <ListTodo className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                    <p className="text-muted-foreground">No tasks yet. Create your first task!</p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="pending" className="mt-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {pendingTasks.map((task) => <TaskCard key={task.id} task={task} />)}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="in-progress" className="mt-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {inProgressTasks.map((task) => <TaskCard key={task.id} task={task} />)}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="completed" className="mt-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {completedTasks.map((task) => <TaskCard key={task.id} task={task} />)}
-            </div>
-          </TabsContent>
-          </>
+            <>
+              <TabsContent value="all" className="mt-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {tasks.length > 0 ? (
+                    tasks.map((task) => <TaskCard key={task.id} task={task} />)
+                  ) : (
+                    <Card className="col-span-full">
+                      <CardContent className="py-12 text-center">
+                        <ListTodo className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                        <p className="text-muted-foreground">No tasks yet. Create your first task!</p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="pending" className="mt-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {pendingTasks.map((task) => <TaskCard key={task.id} task={task} />)}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="in-progress" className="mt-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {inProgressTasks.map((task) => <TaskCard key={task.id} task={task} />)}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="completed" className="mt-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {completedTasks.map((task) => <TaskCard key={task.id} task={task} />)}
+                </div>
+              </TabsContent>
+            </>
           )}
         </Tabs>
       </div>
