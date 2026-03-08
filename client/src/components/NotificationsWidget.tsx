@@ -47,8 +47,13 @@ export function NotificationsWidget() {
         setNotifications(notifResponse.data);
       }
 
-      if (countResponse.success && countResponse.data) {
-        setUnreadCount((countResponse.data as any).unreadCount || 0);
+      if (countResponse.success) {
+        // API returns { success: true, unreadCount: N } — not nested in data
+        const count =
+          (countResponse as any).unreadCount ??
+          (countResponse.data as any)?.unreadCount ??
+          0;
+        setUnreadCount(count);
       }
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
@@ -156,9 +161,8 @@ export function NotificationsWidget() {
             {notifications.map((notification, idx) => (
               <div
                 key={notification._id}
-                className={`p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer ${
-                  !notification.isRead ? "bg-blue-50/50" : ""
-                }`}
+                className={`p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer ${!notification.isRead ? "bg-blue-50/50" : ""
+                  }`}
                 onClick={() =>
                   !notification.isRead && handleMarkAsRead(notification._id)
                 }

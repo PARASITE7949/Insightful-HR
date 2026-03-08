@@ -4,6 +4,7 @@ import DailyReport from "@/models/DailyReport";
 import User from "@/models/User";
 import SystemLog from "@/models/SystemLog";
 import { sendDailyReportSMS } from "@/utils/sms";
+import { createNotification } from "@/controllers/notificationController";
 
 // Submit daily report
 export const submitDailyReport = async (req: Request, res: Response) => {
@@ -208,15 +209,27 @@ export const addReportResponse = async (req: Request, res: Response) => {
 
     await report.save();
 
-    // Send SMS to employee notifying them of response
+    // Fetch employee and send in-app notification + optionally SMS
     const employee = await User.findById(report.userId);
-    if (employee && employee.phone && employee.phoneVerified) {
-      await sendDailyReportSMS(
-        employee.phone,
-        employee.name,
-        user.name,
-        `${user.name} (${user.role === "hr_manager" ? "HR" : "Admin"}) responded to your daily report for ${report.date}.`
+
+    if (employee) {
+      await createNotification(
+        req.user.companyId,
+        "report",
+        `Manager replied to your report`,
+        `${user.name} has replied to your daily report for ${report.date}: "${message.slice(0, 100)}${message.length > 100 ? "..." : ""}"`,
+        reportId,
+        [report.userId as string]
       );
+
+      if (employee.phone && employee.phoneVerified) {
+        await sendDailyReportSMS(
+          employee.phone,
+          employee.name,
+          user.name,
+          `${user.name} (${user.role === "hr_manager" ? "HR" : "Admin"}) responded to your daily report for ${report.date}.`
+        );
+      }
     }
 
     await SystemLog.create({
@@ -261,6 +274,17 @@ export const updateReportStatus = async (req: Request, res: Response) => {
     if (!report) {
       return res.status(404).json({ success: false, message: "Report not found" });
     }
+
+    // Notify the employee about status change
+    const statusLabel = status === "reviewed" ? "reviewed ✅" : "acknowledged 👀";
+    await createNotification(
+      req.user.companyId,
+      "report",
+      `Your daily report has been ${statusLabel}`,
+      `Your daily report for ${report.date} has been marked as "${status}" by the manager.`,
+      reportId,
+      [report.userId as string]
+    );
 
     await SystemLog.create({
       userId: req.user.userId,
