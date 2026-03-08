@@ -379,6 +379,13 @@ class ApiClient {
     return this.request(url, { method: "GET" });
   }
 
+  async sendNotification(data: { title: string; message: string; type?: string; targetUserIds?: string[] }): Promise<ApiResponse> {
+    return this.request("/notifications/send", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
   async getUnreadCount(): Promise<ApiResponse> {
     return this.request(`/notifications/unread-count`, { method: "GET" });
   }

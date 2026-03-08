@@ -4,6 +4,7 @@ import {
   getUnreadCount,
   markAsRead,
   markAllAsRead,
+  sendNotification,
 } from "@/controllers/notificationController";
 import { authMiddleware } from "@/middleware/auth";
 
@@ -14,6 +15,9 @@ router.use(authMiddleware);
 
 // Get notifications for current user
 router.get("/", getNotifications);
+
+// Send a new broadcast notification (Admin/HR)
+router.post("/send", sendNotification);
 
 // Get unread count
 router.get("/unread-count", getUnreadCount);

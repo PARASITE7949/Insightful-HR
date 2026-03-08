@@ -46,6 +46,44 @@ export const createNotification = async (
 };
 
 /**
+ * Express controller to manually trigger broadcast notifications (Admin/HR)
+ */
+export const sendNotification = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    if (!["admin_staff", "hr_manager"].includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: "Forbidden: insufficient permissions to manage notifications" });
+    }
+
+    const { title, message, type = "announcement", targetUserIds } = req.body;
+
+    if (!title || !message) {
+      return res.status(400).json({ success: false, message: "Title and message are required" });
+    }
+
+    const count = await createNotification(
+      req.user.companyId,
+      type,
+      title,
+      message,
+      undefined,
+      targetUserIds?.length > 0 ? targetUserIds : undefined
+    );
+
+    res.json({
+      success: true,
+      message: `Notification sent to ${count} user(s)`,
+      data: { count },
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
  * Get notifications for the current user
  */
 export const getNotifications = async (req: Request, res: Response) => {
