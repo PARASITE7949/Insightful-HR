@@ -112,8 +112,8 @@ export default function Register() {
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="email">Company Email</Label>
-                          <Input id="email" type="email" placeholder="you@company.com" value={formData.email}
+                          <Label htmlFor="email">Employee Email</Label>
+                          <Input id="email" type="email" placeholder="employee@company.com" value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
                           <p className="text-xs text-muted-foreground text-blue-600 bg-blue-50 p-2 rounded">
                             Note: Your email domain must match your company's registered domain for verification.
