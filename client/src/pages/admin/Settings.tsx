@@ -55,11 +55,11 @@ export default function AdminSettings() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Working Hours Per Day</Label>
-                <Input type="number" value={settings.workingHoursPerDay} onChange={(e) => setSettings({ ...settings, workingHoursPerDay: parseInt(e.target.value) })} />
+                <Input type="number" value={settings.workingHoursPerDay} onChange={(e) => setSettings({ ...settings, workingHoursPerDay: parseInt(e.target.value) || 0 })} />
               </div>
               <div className="space-y-2">
                 <Label>Late Threshold (minutes)</Label>
-                <Input type="number" value={settings.lateThresholdMinutes} onChange={(e) => setSettings({ ...settings, lateThresholdMinutes: parseInt(e.target.value) })} />
+                <Input type="number" value={settings.lateThresholdMinutes} onChange={(e) => setSettings({ ...settings, lateThresholdMinutes: parseInt(e.target.value) || 0 })} />
               </div>
             </CardContent>
           </Card>
@@ -73,19 +73,19 @@ export default function AdminSettings() {
               <div className="grid gap-4 md:grid-cols-4">
                 <div className="space-y-2">
                   <Label>Attendance (%)</Label>
-                  <Input type="number" value={settings.performanceWeights.attendance} onChange={(e) => setSettings({ ...settings, performanceWeights: { ...settings.performanceWeights, attendance: parseInt(e.target.value) } })} />
+                  <Input type="number" value={settings.performanceWeights.attendance} onChange={(e) => setSettings({ ...settings, performanceWeights: { ...settings.performanceWeights, attendance: parseInt(e.target.value) || 0 } })} />
                 </div>
                 <div className="space-y-2">
                   <Label>Punctuality (%)</Label>
-                  <Input type="number" value={settings.performanceWeights.punctuality} onChange={(e) => setSettings({ ...settings, performanceWeights: { ...settings.performanceWeights, punctuality: parseInt(e.target.value) } })} />
+                  <Input type="number" value={settings.performanceWeights.punctuality} onChange={(e) => setSettings({ ...settings, performanceWeights: { ...settings.performanceWeights, punctuality: parseInt(e.target.value) || 0 } })} />
                 </div>
                 <div className="space-y-2">
                   <Label>Task Completion (%)</Label>
-                  <Input type="number" value={settings.performanceWeights.taskCompletion} onChange={(e) => setSettings({ ...settings, performanceWeights: { ...settings.performanceWeights, taskCompletion: parseInt(e.target.value) } })} />
+                  <Input type="number" value={settings.performanceWeights.taskCompletion} onChange={(e) => setSettings({ ...settings, performanceWeights: { ...settings.performanceWeights, taskCompletion: parseInt(e.target.value) || 0 } })} />
                 </div>
                 <div className="space-y-2">
                   <Label>Projects (%)</Label>
-                  <Input type="number" value={settings.performanceWeights.projects} onChange={(e) => setSettings({ ...settings, performanceWeights: { ...settings.performanceWeights, projects: parseInt(e.target.value) } })} />
+                  <Input type="number" value={settings.performanceWeights.projects} onChange={(e) => setSettings({ ...settings, performanceWeights: { ...settings.performanceWeights, projects: parseInt(e.target.value) || 0 } })} />
                 </div>
               </div>
             </CardContent>

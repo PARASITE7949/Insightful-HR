@@ -35,6 +35,14 @@ import {
   User,
   Calendar,
 } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { getCompanyById } from "@/lib/storage";
 
 interface NavItem {
@@ -197,6 +205,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Mobile Sidebar */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetContent side="left" className="w-64 p-0 bg-sidebar border-sidebar-border">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Navigation Menu</SheetTitle>
+            <SheetDescription>Main navigation for the portal</SheetDescription>
+          </SheetHeader>
           <SidebarContent />
         </SheetContent>
       </Sheet>
@@ -210,6 +222,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-64 bg-sidebar border-sidebar-border">
+              <SheetHeader className="sr-only">
+                <SheetTitle>Navigation Menu</SheetTitle>
+                <SheetDescription>Mobile navigation sidebar</SheetDescription>
+              </SheetHeader>
+              <SidebarContent />
+            </SheetContent>
           </Sheet>
 
           <div className="flex-1" />

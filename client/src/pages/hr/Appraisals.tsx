@@ -112,7 +112,7 @@ export default function HRAppraisals() {
 
   const handleApprove = async () => {
     if (!selectedAppraisal || !user) return;
-    
+
     try {
       // Update appraisal via API
       const response = await apiClient.updateAppraisal(selectedAppraisal._id || selectedAppraisal.id, {
@@ -120,7 +120,7 @@ export default function HRAppraisals() {
         hrComments: reviewData.comments,
         finalRating: reviewData.rating,
       });
-      
+
       if (response.success) {
         toast.success("Appraisal approved!");
         setIsReviewDialogOpen(false);
@@ -133,13 +133,13 @@ export default function HRAppraisals() {
 
   const handleReject = async () => {
     if (!selectedAppraisal || !user) return;
-    
+
     try {
       const response = await apiClient.updateAppraisal(selectedAppraisal._id || selectedAppraisal.id, {
         status: "rejected",
         hrComments: reviewData.comments,
       });
-      
+
       if (response.success) {
         toast.success("Appraisal marked for revision");
         setIsReviewDialogOpen(false);
@@ -179,13 +179,13 @@ export default function HRAppraisals() {
           </div>
           <Badge variant={
             appraisal.status === "approved" ? "default" :
-            appraisal.status === "rejected" ? "destructive" :
-            appraisal.status === "reviewed" ? "secondary" : "outline"
+              appraisal.status === "rejected" ? "destructive" :
+                appraisal.status === "reviewed" ? "secondary" : "outline"
           }>
             {appraisal.status}
           </Badge>
         </div>
-        
+
         <div className="mt-4 space-y-2">
           <div className="flex justify-between text-sm">
             <span>Overall Score</span>
@@ -193,7 +193,7 @@ export default function HRAppraisals() {
           </div>
           <Progress value={appraisal.overallScore || 0} />
         </div>
-        
+
         <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Attendance</span>
@@ -212,9 +212,9 @@ export default function HRAppraisals() {
             <span>{appraisal.projectScore || 0}%</span>
           </div>
         </div>
-        
-        <Button 
-          className="w-full mt-4" 
+
+        <Button
+          className="w-full mt-4"
           variant="outline"
           onClick={() => handleReview(appraisal)}
         >
@@ -310,7 +310,7 @@ export default function HRAppraisals() {
             <TabsTrigger value="rejected">Needs Revision ({rejectedAppraisals.length})</TabsTrigger>
             <TabsTrigger value="all">All ({appraisals.length})</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="pending" className="mt-4">
             {pendingAppraisals.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -327,7 +327,7 @@ export default function HRAppraisals() {
               </Card>
             )}
           </TabsContent>
-          
+
           <TabsContent value="approved" className="mt-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {approvedAppraisals.map((appraisal) => (
@@ -335,7 +335,7 @@ export default function HRAppraisals() {
               ))}
             </div>
           </TabsContent>
-          
+
           <TabsContent value="rejected" className="mt-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {rejectedAppraisals.map((appraisal) => (
@@ -343,7 +343,7 @@ export default function HRAppraisals() {
               ))}
             </div>
           </TabsContent>
-          
+
           <TabsContent value="all" className="mt-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {appraisals.map((appraisal) => (
@@ -362,7 +362,7 @@ export default function HRAppraisals() {
                 Review performance report for {selectedAppraisal?.employeeName}
               </DialogDescription>
             </DialogHeader>
-            
+
             {selectedAppraisal && (
               <div className="space-y-6">
                 {/* Employee Info */}
@@ -444,7 +444,7 @@ export default function HRAppraisals() {
                       <Label>Final Rating</Label>
                       <Select
                         value={reviewData.rating}
-                        onValueChange={(v: AppraisalReport["finalRating"]) => 
+                        onValueChange={(v: AppraisalReport["finalRating"]) =>
                           setReviewData({ ...reviewData, rating: v })
                         }
                       >
@@ -475,7 +475,7 @@ export default function HRAppraisals() {
                       <h4 className="font-semibold flex items-center gap-2">
                         <Award className="h-4 w-4" /> Rewards & Recognition
                       </h4>
-                      
+
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <TrendingUp className="h-4 w-4 text-primary" />
@@ -534,7 +534,7 @@ export default function HRAppraisals() {
                 )}
               </div>
             )}
-            
+
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsReviewDialogOpen(false)}>
                 Close
@@ -601,7 +601,7 @@ export default function HRAppraisals() {
                   id="year"
                   type="number"
                   value={generateData.year}
-                  onChange={(e) => setGenerateData({ ...generateData, year: parseInt(e.target.value) })}
+                  onChange={(e) => setGenerateData({ ...generateData, year: parseInt(e.target.value) || new Date().getFullYear() })}
                 />
               </div>
 
