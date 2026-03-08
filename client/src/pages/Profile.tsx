@@ -48,7 +48,7 @@ export default function Profile() {
     const updates = { name: name.trim(), phone, address: address.trim(), department: department.trim(), position: position.trim() };
     updateUser(user.id, updates);
     setAuthUser({ ...user, ...updates });
-    
+
     setIsEditing(false);
     setIsSaving(false);
     toast.success("Profile updated successfully!");
@@ -184,6 +184,7 @@ export default function Profile() {
             <CardTitle className="text-lg">Account Info</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
+            <div className="flex justify-between"><span className="text-muted-foreground">Employee ID</span><span className="font-mono">{user.employeeId || "N/A"}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Role</span><span className="capitalize">{user.role.replace("_", " ")}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Join Date</span><span>{user.joinDate}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Status</span><span className={user.isActive ? "text-green-600" : "text-destructive"}>{user.isActive ? "Active" : "Inactive"}</span></div>

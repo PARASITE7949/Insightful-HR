@@ -18,6 +18,7 @@ export interface User {
   verified?: boolean;
   approvedBy?: string | null;
   approvedAt?: string | null;
+  employeeId?: string;
   name: string;
   role: UserRole;
   department: string;
@@ -45,7 +46,7 @@ export interface PromotionRecord {
 }
 
 export interface AttendanceRecord {
-    _id?: string;
+  _id?: string;
   id: string;
   userId: string;
   companyId: string;

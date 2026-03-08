@@ -14,6 +14,7 @@ export interface IUser {
   otpPhone?: string;
   otpPhoneExpiresAt?: Date;
   approvedByAdmin?: boolean;
+  employeeId?: string;
   name: string;
   password: string;
   role: UserRole;

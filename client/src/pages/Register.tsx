@@ -22,7 +22,6 @@ export default function Register() {
     department: "",
     position: "",
   });
-  const [step, setStep] = useState<"form" | "pending">("form");
   const [isLoading, setIsLoading] = useState(false);
   const { register, hasCompanyRegistered } = useAuth();
   const navigate = useNavigate();
@@ -58,9 +57,8 @@ export default function Register() {
       password: formData.password,
     });
     if (success) {
-      toast.success("Registration successful! Awaiting super admin approval.");
-      setStep("pending");
-      setTimeout(() => navigate("/login"), 3000);
+      toast.success("Registration successful! Awaiting admin approval. Please login later.");
+      navigate("/login");
     }
     setIsLoading(false);
   };
@@ -99,109 +97,85 @@ export default function Register() {
                 </TabsList>
 
                 <TabsContent value="member">
-                  {step === "form" ? (
-                    <div className="space-y-4">
-                      <div className="text-center mb-4">
-                        <h3 className="text-lg font-semibold">Join a Company</h3>
-                        <p className="text-sm text-muted-foreground">Create your account using your company email</p>
+                  <div className="space-y-4">
+                    <div className="text-center mb-4">
+                      <h3 className="text-lg font-semibold">Join a Company</h3>
+                      <p className="text-sm text-muted-foreground">Create your account using your company email</p>
+                    </div>
+                    <form onSubmit={handleFormSubmit} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Full Name</Label>
+                        <Input id="name" placeholder="Enter your full name" value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
                       </div>
-                      <form onSubmit={handleFormSubmit} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Employee Email</Label>
+                        <Input id="email" type="email" placeholder="employee@company.com" value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
+                        <p className="text-xs text-muted-foreground text-blue-600 bg-blue-50 p-2 rounded">
+                          Note: Your email domain must match your company's registered domain for verification.
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input id="phone" type="tel" placeholder="9876543210" maxLength={10} value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} required />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="name">Full Name</Label>
-                          <Input id="name" placeholder="Enter your full name" value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+                          <Label htmlFor="password">Password</Label>
+                          <Input id="password" type="password" placeholder="••••••••" value={formData.password}
+                            onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="email">Employee Email</Label>
-                          <Input id="email" type="email" placeholder="employee@company.com" value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
-                          <p className="text-xs text-muted-foreground text-blue-600 bg-blue-50 p-2 rounded">
-                            Note: Your email domain must match your company's registered domain for verification.
-                          </p>
+                          <Label htmlFor="confirmPassword">Confirm</Label>
+                          <Input id="confirmPassword" type="password" placeholder="••••••••" value={formData.confirmPassword}
+                            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} required />
                         </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Role</Label>
+                        <Select value={formData.role}
+                          onValueChange={(value: UserRole) => setFormData({ ...formData, role: value, position: "" })}>
+                          <SelectTrigger><SelectValue placeholder="Select role" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="employee">Employee</SelectItem>
+                            <SelectItem value="hr_manager">HR Manager</SelectItem>
+                            <SelectItem value="admin_staff">Admin Staff</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="phone">Phone Number</Label>
-                          <Input id="phone" type="tel" placeholder="9876543210" maxLength={10} value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} required />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input id="password" type="password" placeholder="••••••••" value={formData.password}
-                              onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirm</Label>
-                            <Input id="confirmPassword" type="password" placeholder="••••••••" value={formData.confirmPassword}
-                              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} required />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Role</Label>
-                          <Select value={formData.role}
-                            onValueChange={(value: UserRole) => setFormData({ ...formData, role: value, position: "" })}>
-                            <SelectTrigger><SelectValue placeholder="Select role" /></SelectTrigger>
+                          <Label>Department</Label>
+                          <Select value={formData.department}
+                            onValueChange={(value) => setFormData({ ...formData, department: value })}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="employee">Employee</SelectItem>
-                              <SelectItem value="hr_manager">HR Manager</SelectItem>
-                              <SelectItem value="admin_staff">Admin Staff</SelectItem>
+                              {departments.map((dept) => (
+                                <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label>Department</Label>
-                            <Select value={formData.department}
-                              onValueChange={(value) => setFormData({ ...formData, department: value })}>
-                              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                              <SelectContent>
-                                {departments.map((dept) => (
-                                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Position</Label>
-                            <Select value={formData.position}
-                              onValueChange={(value) => setFormData({ ...formData, position: value })}>
-                              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                              <SelectContent>
-                                {positions[formData.role]?.map((pos) => (
-                                  <SelectItem key={pos} value={pos}>{pos}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                          {isLoading ? "Registering..." : "Create Member Account"}
-                        </Button>
-                      </form>
-                    </div>
-                  ) : (
-                    <div className="space-y-6 text-center">
-                      <div className="flex justify-center">
-                        <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
-                          <Building2 className="h-8 w-8 text-green-600" />
+                        <div className="space-y-2">
+                          <Label>Position</Label>
+                          <Select value={formData.position}
+                            onValueChange={(value) => setFormData({ ...formData, position: value })}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                              {positions[formData.role]?.map((pos) => (
+                                <SelectItem key={pos} value={pos}>{pos}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold">Registration Successful!</h3>
-                        <p className="text-sm text-muted-foreground mt-2">
-                          Your account has been created. Your system admin will review and approve your access shortly.
-                        </p>
-                      </div>
-                      <div className="bg-muted/50 rounded-lg p-4 text-sm text-left space-y-2">
-                        <p><strong>Name:</strong> {formData.name}</p>
-                        <p><strong>Email:</strong> {formData.email}</p>
-                        <p><strong>Role:</strong> {formData.role.replace(/_/g, " ")}</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        You will be redirected shortly...
-                      </p>
-                    </div>
-                  )}
+                      <Button type="submit" className="w-full" disabled={isLoading}>
+                        {isLoading ? "Registering..." : "Create Member Account"}
+                      </Button>
+                    </form>
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="company" className="space-y-6">

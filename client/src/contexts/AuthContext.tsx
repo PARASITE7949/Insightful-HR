@@ -38,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (response.success && response.data) {
             const userData: User = {
               id: response.data.id,
+              employeeId: response.data.employeeId,
               companyId: response.data.companyId,
               email: response.data.email,
               name: response.data.name,
@@ -74,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.success && response.data) {
         const userData: User = {
           id: response.data.user.id,
+          employeeId: response.data.user.employeeId,
           companyId: response.data.user.companyId,
           email: response.data.user.email,
           name: response.data.user.name,
@@ -126,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.success && response.data) {
         const newUser: User = {
           id: response.data.user.id,
+          employeeId: response.data.user.employeeId,
           companyId: response.data.user.companyId,
           email: response.data.user.email,
           name: response.data.user.name,

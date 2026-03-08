@@ -39,9 +39,11 @@ export const registerCompany = async (req: Request, res: Response) => {
 
     // Create admin user
     const hashedPassword = await hashPassword(adminPassword);
+    const employeeId = "ADM-" + Math.floor(100000 + Math.random() * 900000).toString();
     const user = await User.create({
       _id: adminId,
       companyId,
+      employeeId,
       email: adminEmail.toLowerCase(),
       name: adminName,
       phone: adminPhone,
@@ -108,10 +110,13 @@ export const register = async (req: Request, res: Response) => {
 
     const userId = uuidv4();
     const hashedPassword = await hashPassword(password);
+    const prefix = role === "admin_staff" ? "ADM" : role === "hr_manager" ? "HR" : "EMP";
+    const employeeId = `${prefix}-${Math.floor(100000 + Math.random() * 900000)}`;
 
     const user = await User.create({
       _id: userId,
       companyId: company._id,
+      employeeId,
       email: email.toLowerCase(),
       phone,
       name,
@@ -143,6 +148,7 @@ export const register = async (req: Request, res: Response) => {
         userId,
         user: {
           id: user._id,
+          employeeId: user.employeeId,
           name: user.name,
           email: user.email,
           phone: user.phone,
@@ -212,6 +218,7 @@ export const login = async (req: Request, res: Response) => {
         token,
         user: {
           id: user._id,
+          employeeId: user.employeeId,
           name: user.name,
           email: user.email,
           phone: user.phone,
@@ -244,6 +251,7 @@ export const getCurrentUser = async (req: Request, res: Response) => {
       success: true,
       data: {
         id: user._id,
+        employeeId: user.employeeId,
         name: user.name,
         email: user.email,
         phone: user.phone,

@@ -57,6 +57,10 @@ const userSchema = new Schema<UserDocument>(
       minlength: 6,
       select: false, // Don't return password by default
     },
+    employeeId: {
+      type: String,
+      trim: true,
+    },
     role: {
       type: String,
       enum: ["hr_manager", "admin_staff", "employee"],
