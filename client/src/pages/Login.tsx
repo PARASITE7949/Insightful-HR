@@ -7,8 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Building2, User, Users, Shield, Crown, UserCog } from "lucide-react";
-import { getUsers } from "@/lib/storage";
-
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,21 +33,6 @@ export default function Login() {
     await login(email, password);
     setIsLoading(false);
   };
-
-  const handleDemoLogin = async (demoEmail: string) => {
-    setEmail(demoEmail);
-    setIsLoading(true);
-    await login(demoEmail, "demo");
-    setIsLoading(false);
-  };
-
-  // Get demo accounts dynamically
-  const allUsers = getUsers();
-  const demoAccounts = [
-    { email: allUsers.find(u => u.role === "hr_manager")?.email || "", role: "HR Manager", icon: <Users className="h-4 w-4" /> },
-    { email: allUsers.find(u => u.role === "admin_staff")?.email || "", role: "Admin", icon: <UserCog className="h-4 w-4" /> },
-    { email: allUsers.find(u => u.role === "employee")?.email || "", role: "Employee", icon: <User className="h-4 w-4" /> },
-  ].filter(acc => acc.email);
 
   return (
     <div className="flex min-h-screen">
@@ -171,30 +154,6 @@ export default function Login() {
                       {isLoading ? "Signing in..." : "Company Sign In"}
                     </Button>
                   </form>
-                  <div className="mt-6 border-t pt-6">
-                    <p className="text-sm text-muted-foreground text-center mb-4 text-xs font-semibold uppercase tracking-wider">
-                      Demo Accounts
-                    </p>
-                    <div className="grid gap-2">
-                      {demoAccounts.map((account) => (
-                        <Button
-                          key={account.email}
-                          variant="outline"
-                          size="sm"
-                          className="w-full justify-start h-auto py-2"
-                          onClick={() => handleDemoLogin(account.email)}
-                          disabled={isLoading}
-                        >
-                          <div className="flex items-center gap-2">
-                            {account.icon}
-                            <div className="text-left">
-                              <div className="text-xs font-medium">{account.role}</div>
-                            </div>
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
