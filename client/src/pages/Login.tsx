@@ -199,21 +199,28 @@ export default function Login() {
               </Tabs>
             </CardContent>
             <CardFooter className="flex-col gap-4 text-center">
-              {!hasCompanyRegistered ? (
-                <p className="text-sm text-muted-foreground">
-                  No company registered yet?{" "}
-                  <Link to="/company-register" className="text-primary font-medium hover:underline">
-                    Register your company
-                  </Link>
-                </p>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  Don't have an account?{" "}
+              <div className="flex flex-col space-y-2 text-sm text-muted-foreground w-full">
+                <p>
+                  Don't have an employee account?{" "}
                   <Link to="/register" className="text-primary font-medium hover:underline">
-                    Register here
+                    Register Employee
                   </Link>
                 </p>
-              )}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">Or</span>
+                  </div>
+                </div>
+                <p>
+                  Need to setup a new workspace?{" "}
+                  <Link to="/company-register" className="text-primary font-medium hover:underline">
+                    Register Company
+                  </Link>
+                </p>
+              </div>
             </CardFooter>
           </Card>
         </div>

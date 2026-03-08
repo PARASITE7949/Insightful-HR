@@ -65,23 +65,6 @@ export default function Register() {
     setIsLoading(false);
   };
 
-  if (!hasCompanyRegistered) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-6">
-        <Card className="max-w-md w-full">
-          <CardHeader className="text-center">
-            <CardTitle>No Company Registered</CardTitle>
-            <CardDescription>A company must be registered before users can sign up.</CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            <Link to="/company-register">
-              <Button className="gap-2"><Building2 className="h-4 w-4" /> Register Your Company</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="flex min-h-screen">
