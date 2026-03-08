@@ -21,39 +21,11 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:8080",
-  "http://localhost:8082",
-  "https://insightful-hr.onrender.com",
-  "https://insightful-hr-1.onrender.com"
-];
-
-const frontendOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "").split(",").map((s: string) => s.trim()).filter(Boolean);
-allowedOrigins.push(...frontendOrigins);
+// Trust Render's reverse proxy for correct IP handling in rate limiter
+app.set("trust proxy", 1);
 
 app.use(cors({
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow non-browser requests like curl/postman (no origin)
-    if (!origin) return callback(null, true);
-
-    // Check if origin is in allowed list or starts with localhost
-    if (allowedOrigins.includes(origin) || origin.startsWith("http://localhost") || origin.startsWith("https://localhost")) {
-      return callback(null, true);
-    }
-
-    // For production flexibility, if we are in production, maybe be more lenient or log the rejected origin
-    if (process.env.NODE_ENV === "production") {
-      // In production, we might want to log it but still allow it if we are troubleshooting
-      console.log(`CORS attempt from: ${origin}`);
-      // For now, let's allow all render origins to avoid blocking the user
-      if (origin.endsWith(".onrender.com")) {
-        return callback(null, true);
-      }
-    }
-
-    return callback(new Error("CORS policy: origin not allowed"));
-  },
+  origin: true, // Reflects the origin dynamically to allow all cross-origin requests securely
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
