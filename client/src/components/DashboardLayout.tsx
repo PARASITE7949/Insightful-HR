@@ -202,16 +202,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <SidebarContent />
       </aside>
 
-      {/* Mobile Sidebar */}
-      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-64 p-0 bg-sidebar border-sidebar-border">
-          <SheetHeader className="sr-only">
-            <SheetTitle>Navigation Menu</SheetTitle>
-            <SheetDescription>Main navigation for the portal</SheetDescription>
-          </SheetHeader>
-          <SidebarContent />
-        </SheetContent>
-      </Sheet>
+
 
       {/* Main Content */}
       <div className="flex-1 lg:pl-64">
