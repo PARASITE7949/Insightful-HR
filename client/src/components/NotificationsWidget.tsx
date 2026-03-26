@@ -15,7 +15,7 @@ import { format } from "date-fns";
 
 interface Notification {
   _id: string;
-  type: "holiday" | "appraisal" | "report" | "announcement" | "system";
+  type: "holiday" | "appraisal" | "report" | "announcement" | "system" | "task" | "festival" | "event" | "government";
   title: string;
   message: string;
   isRead: boolean;
@@ -89,12 +89,20 @@ export function NotificationsWidget() {
     switch (type) {
       case "holiday":
         return "🎉";
+      case "festival":
+        return "🎡";
+      case "government":
+        return "🏛️";
+      case "event":
+        return "🎯";
       case "appraisal":
         return "📊";
       case "report":
         return "📋";
       case "announcement":
         return "📢";
+      case "task":
+        return "📋";
       default:
         return "🔔";
     }
@@ -104,12 +112,20 @@ export function NotificationsWidget() {
     switch (type) {
       case "holiday":
         return "text-blue-600";
+      case "festival":
+        return "text-pink-600";
+      case "government":
+        return "text-indigo-600";
+      case "event":
+        return "text-rose-600";
       case "appraisal":
         return "text-green-600";
       case "report":
         return "text-purple-600";
       case "announcement":
         return "text-orange-600";
+      case "task":
+        return "text-emerald-600";
       default:
         return "text-gray-600";
     }

@@ -72,7 +72,9 @@ export default function EmployeeAttendance() {
       const mm = now.getMinutes().toString().padStart(2, "0");
       const checkOut = `${hh}:${mm}`;
       const [inH, inM] = (todayRecord.checkIn || "00:00").split(":").map(Number);
-      const hours = Math.round(((now.getHours() * 60 + now.getMinutes()) - (inH * 60 + inM)) / 60 * 100) / 100;
+      let diffMins = (now.getHours() * 60 + now.getMinutes()) - (inH * 60 + inM);
+      if (diffMins < 0) diffMins += 24 * 60; // Handle overnight shifts
+      const hours = Math.round(diffMins / 60 * 100) / 100;
       const res = await apiClient.updateAttendance(todayRecord._id || todayRecord.id, { checkOut, workingHours: hours });
       if (res.success) {
         const r = await apiClient.getAttendance(user.id);

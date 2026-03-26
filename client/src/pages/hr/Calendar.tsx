@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import apiClient from "@/lib/apiClient";
-import { CalendarDays, Plus, Edit, Trash2, MapPin } from "lucide-react";
+import { CalendarDays, Plus, Edit, Trash2, MapPin, Send, Bell, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -56,9 +56,32 @@ export default function HRCalendar() {
     recurringDay: new Date().getDate(),
   });
 
+  // Broadcast Notification State
+  const [broadcastData, setBroadcastData] = useState({
+    title: "",
+    message: "",
+    type: "announcement",
+    sendTo: "all"
+  });
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [employees, setEmployees] = useState<any[]>([]);
+
   useEffect(() => {
     fetchHolidays();
+    fetchEmployees();
   }, [user, currentMonth, currentYear]);
+
+  const fetchEmployees = async () => {
+    if (!user) return;
+    try {
+      const response = await apiClient.getUsers();
+      if (response.success && Array.isArray(response.data)) {
+        setEmployees(response.data.filter((u: any) => u.id !== user?.id));
+      }
+    } catch (error) {
+      console.error("Failed to fetch employees:", error);
+    }
+  };
 
   const fetchHolidays = async () => {
     if (!user) return;
@@ -151,6 +174,42 @@ export default function HRCalendar() {
       fetchHolidays();
     } catch (error: any) {
       toast.error(error.message || "Failed to delete holiday");
+    }
+  };
+
+  const handleSendBroadcast = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!broadcastData.title.trim() || !broadcastData.message.trim()) {
+      toast.error("Please enter a title and message for the broadcast");
+      return;
+    }
+
+    setIsBroadcasting(true);
+    try {
+      const payload = {
+        title: broadcastData.title.trim(),
+        message: broadcastData.message.trim(),
+        type: broadcastData.type,
+        targetUserIds: broadcastData.sendTo === "all" ? [] : [broadcastData.sendTo],
+      };
+
+      const response = await apiClient.sendNotification(payload);
+
+      if (response.success) {
+        toast.success(response.message || "Broadcast sent successfully!");
+        setBroadcastData({
+          title: "",
+          message: "",
+          type: "announcement",
+          sendTo: "all"
+        });
+      } else {
+        toast.error(response.message || "Failed to send broadcast");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred during broadcasting");
+    } finally {
+      setIsBroadcasting(false);
     }
   };
 
@@ -370,6 +429,97 @@ export default function HRCalendar() {
                 <p>No events scheduled for this month</p>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Manual Broadcast Section */}
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5 text-primary" />
+              Send Quick Broadcast
+            </CardTitle>
+            <CardDescription>
+              Need to announce something immediately? Send a notification to all or specific staff members.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSendBroadcast} className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="space-y-2 lg:col-span-2">
+                  <Label htmlFor="b-title">Title</Label>
+                  <Input
+                    id="b-title"
+                    placeholder="e.g., Staff Meeting Tomorrow"
+                    value={broadcastData.title}
+                    onChange={(e) => setBroadcastData({ ...broadcastData, title: e.target.value })}
+                    disabled={isBroadcasting}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="b-type">Type</Label>
+                  <Select 
+                    value={broadcastData.type} 
+                    onValueChange={(v) => setBroadcastData({ ...broadcastData, type: v })} 
+                    disabled={isBroadcasting}
+                  >
+                    <SelectTrigger id="b-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="announcement">📢 Announcement</SelectItem>
+                      <SelectItem value="alert">⚠️ Urgent Alert</SelectItem>
+                      <SelectItem value="system">⚙️ System Update</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="b-sendTo">Recipient</Label>
+                  <Select 
+                    value={broadcastData.sendTo} 
+                    onValueChange={(v) => setBroadcastData({ ...broadcastData, sendTo: v })} 
+                    disabled={isBroadcasting}
+                  >
+                    <SelectTrigger id="b-sendTo">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Everyone</SelectItem>
+                      {employees.map((emp) => (
+                        <SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="b-message">Message</Label>
+                <div className="flex gap-4 items-start">
+                  <Textarea
+                    id="b-message"
+                    placeholder="Details about your announcement..."
+                    className="flex-1 min-h-[80px]"
+                    value={broadcastData.message}
+                    onChange={(e) => setBroadcastData({ ...broadcastData, message: e.target.value })}
+                    disabled={isBroadcasting}
+                  />
+                  <Button 
+                    type="submit" 
+                    className="h-[80px] w-[120px]" 
+                    disabled={isBroadcasting}
+                  >
+                    {isBroadcasting ? (
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <div className="flex flex-col items-center gap-1">
+                        <Send className="h-5 w-5" />
+                        <span>Broadcast</span>
+                      </div>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </form>
           </CardContent>
         </Card>
 

@@ -8,7 +8,7 @@ import User from "@/models/User";
  */
 export const createNotification = async (
   companyId: string,
-  type: "holiday" | "appraisal" | "report" | "announcement" | "system",
+  type: "holiday" | "appraisal" | "report" | "announcement" | "system" | "task" | "festival" | "event" | "government",
   title: string,
   message: string,
   relatedId?: string,
@@ -17,7 +17,7 @@ export const createNotification = async (
   try {
     // Get all user IDs in the company if not specified
     let targetUserIds = userIds;
-    if (!targetUserIds) {
+    if (!targetUserIds || targetUserIds.length === 0) {
       const users = await User.find(
         { companyId, role: { $in: ["employee", "hr_manager", "admin_staff"] } },
         { _id: 1 }

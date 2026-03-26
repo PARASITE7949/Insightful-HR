@@ -14,8 +14,13 @@ import { Switch } from "@/components/ui/switch";
 import apiClient from "@/lib/apiClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppraisalReport } from "@/types";
-import { FileText, CheckCircle, XCircle, Clock, Eye, Brain, Award, DollarSign, TrendingUp, Zap } from "lucide-react";
+import { FileText, CheckCircle, XCircle, Clock, Eye, Brain, Award, DollarSign, TrendingUp, Zap, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
 
 export default function HRAppraisals() {
   const { user } = useAuth();
@@ -72,13 +77,16 @@ export default function HRAppraisals() {
     }
   };
 
-  const handleGenerateMonthly = async () => {
+  const handleGenerateMonthly = async (m?: number, y?: number) => {
+    const targetMonth = m || new Date().getMonth() + 1;
+    const targetYear = y || new Date().getFullYear();
+    
     setIsGeneratingMonthly(true);
     try {
-      const response = await apiClient.generateMonthlyAppraisals(generateData.month, generateData.year);
+      const response = await apiClient.generateMonthlyAppraisals(targetMonth, targetYear);
       if (response.success) {
         toast.success(
-          `Generated ${response.data.generated} appraisals and sent ${response.data.smsNotifications} SMS notifications!`
+          `Generated ${response.data.generated} appraisals and sent ${response.data.smsNotifications} SMS notifications for ${targetMonth}/${targetYear}!`
         );
         setShowGenerateDialog(false);
         refreshAppraisals();
@@ -119,10 +127,14 @@ export default function HRAppraisals() {
         status: "approved",
         hrComments: reviewData.comments,
         finalRating: reviewData.rating,
+        promotionRecommended: reviewData.promotionRecommended,
+        bonusRecommended: reviewData.bonusRecommended,
+        bonusAmount: parseFloat(reviewData.bonusAmount) || 0,
+        incrementPercentage: parseFloat(reviewData.incrementPercentage) || 0,
       });
 
       if (response.success) {
-        toast.success("Appraisal approved!");
+        toast.success("Appraisal approved with rewards!");
         setIsReviewDialogOpen(false);
         refreshAppraisals();
       }
@@ -292,12 +304,23 @@ export default function HRAppraisals() {
                   <CardDescription>Create appraisals for all employees and send SMS notifications</CardDescription>
                 </div>
               </div>
-              <Button
-                onClick={() => setShowGenerateDialog(true)}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                Generate Now
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setShowGenerateDialog(true)}>
+                  Custom Date
+                </Button>
+                <Button
+                  onClick={() => handleGenerateMonthly()}
+                  disabled={isGeneratingMonthly}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {isGeneratingMonthly ? (
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Zap className="h-4 w-4 mr-2" />
+                  )}
+                  Generate for {monthNames[new Date().getMonth()]}
+                </Button>
+              </div>
             </div>
           </CardHeader>
         </Card>
@@ -573,22 +596,9 @@ export default function HRAppraisals() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {[
-                      { num: 1, name: "January" },
-                      { num: 2, name: "February" },
-                      { num: 3, name: "March" },
-                      { num: 4, name: "April" },
-                      { num: 5, name: "May" },
-                      { num: 6, name: "June" },
-                      { num: 7, name: "July" },
-                      { num: 8, name: "August" },
-                      { num: 9, name: "September" },
-                      { num: 10, name: "October" },
-                      { num: 11, name: "November" },
-                      { num: 12, name: "December" },
-                    ].map((month) => (
-                      <SelectItem key={month.num} value={month.num.toString()}>
-                        {month.name}
+                    {monthNames.map((name, idx) => (
+                      <SelectItem key={idx + 1} value={(idx + 1).toString()}>
+                        {name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -624,10 +634,10 @@ export default function HRAppraisals() {
               <Button variant="outline" onClick={() => setShowGenerateDialog(false)} disabled={isGeneratingMonthly}>
                 Cancel
               </Button>
-              <Button onClick={handleGenerateMonthly} disabled={isGeneratingMonthly} className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={() => handleGenerateMonthly(generateData.month, generateData.year)} disabled={isGeneratingMonthly} className="bg-blue-600 hover:bg-blue-700">
                 {isGeneratingMonthly ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    <RefreshCw className="h-4 w-4 animate-spin mr-2" />
                     Generating...
                   </>
                 ) : (

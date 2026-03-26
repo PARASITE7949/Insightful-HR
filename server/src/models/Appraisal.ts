@@ -73,6 +73,22 @@ const appraisalSchema = new Schema<AppraisalDocument>(
       type: String,
       enum: ["exceptional", "exceeds-expectations", "meets-expectations", "needs-improvement", "unsatisfactory"],
     },
+    promotionRecommended: {
+      type: Boolean,
+      default: false,
+    },
+    bonusRecommended: {
+      type: Boolean,
+      default: false,
+    },
+    bonusAmount: {
+      type: Number,
+      default: 0,
+    },
+    incrementPercentage: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

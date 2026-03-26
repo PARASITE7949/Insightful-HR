@@ -4,8 +4,10 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import apiClient from "@/lib/apiClient";
-import { Clock, ListTodo, TrendingUp, Calendar, CheckCircle, AlertCircle } from "lucide-react";
+import { Clock, ListTodo, TrendingUp, Calendar, CheckCircle, AlertCircle, Award, CreditCard, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function EmployeeDashboard() {
   const { user } = useAuth();
@@ -14,6 +16,7 @@ export default function EmployeeDashboard() {
 
   const [attendance, setAttendance] = useState<any[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
+  const [appraisals, setAppraisals] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -31,6 +34,11 @@ export default function EmployeeDashboard() {
         
         if (tasksRes.success && Array.isArray(tasksRes.data)) {
           setTasks(tasksRes.data);
+        }
+
+        const appraisalsRes = await apiClient.getAppraisalsByUser(user.id);
+        if (appraisalsRes.success && Array.isArray(appraisalsRes.data)) {
+          setAppraisals(appraisalsRes.data);
         }
       } catch (error) {
         console.error("Failed to fetch dashboard data", error);
@@ -96,7 +104,7 @@ export default function EmployeeDashboard() {
   // Calculate Task Completion Score
   const taskCompletionScore = thisMonthTasks.length > 0
     ? Math.round((thisMonthTasks.filter(t => t.status === "completed").length / thisMonthTasks.length) * 100)
-    : 75; // Default if no tasks
+    : 0; // Default if no tasks
 
   // Calculate Project Delivery Score
   const completedTaskList = thisMonthTasks.filter(t => t.status === "completed");
@@ -107,7 +115,7 @@ export default function EmployeeDashboard() {
 
   const projectScore = completedTaskList.length > 0
     ? Math.round((onTimeCompletions / completedTaskList.length) * 100)
-    : 50; // Default if no completed tasks
+    : 0; // Default if no completed tasks
 
   // Calculate Overall Score
   const overallScore = Math.round(
@@ -180,6 +188,50 @@ export default function EmployeeDashboard() {
           <h1 className="text-3xl font-bold">Welcome back, {user.name.split(" ")[0]}!</h1>
           <p className="text-muted-foreground">Here's an overview of your performance this month (Live Updates)</p>
         </div>
+
+        {/* Latest Appraisal Notification Card (Only if approved appraisal exists) */}
+        {appraisals.filter(a => a.status === "approved").length > 0 && (
+          <Card className="border-primary/20 bg-primary/5 dark:bg-primary/10 overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+              <Award className="h-24 w-24 text-primary" />
+            </div>
+            <CardContent className="pt-6">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                    <Award className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold">Latest Appraisal Approved!</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Your performance review for {appraisals.filter(a => a.status === "approved")[0].month} {appraisals.filter(a => a.status === "approved")[0].year} is now official.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  {appraisals.filter(a => a.status === "approved")[0].incrementPercentage > 0 && (
+                    <Badge className="bg-blue-500 hover:bg-blue-600">
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                      +{appraisals.filter(a => a.status === "approved")[0].incrementPercentage}% Increment
+                    </Badge>
+                  )}
+                  {appraisals.filter(a => a.status === "approved")[0].bonusAmount > 0 && (
+                    <Badge className="bg-green-500 hover:bg-green-600">
+                      <CreditCard className="h-3 w-3 mr-1" />
+                      ₹{appraisals.filter(a => a.status === "approved")[0].bonusAmount.toLocaleString()} Bonus
+                    </Badge>
+                  )}
+                  <Button asChild variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10">
+                    <Link to="/employee/performance">
+                      View Full Report <ChevronRight className="h-4 w-4 ml-1" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Stats */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

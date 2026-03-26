@@ -67,7 +67,6 @@ const hrNav: NavItem[] = [
   { label: "Reports", href: "/hr/reports", icon: <FileText className="h-5 w-5" /> },
   { label: "Appraisals", href: "/hr/appraisals", icon: <Award className="h-5 w-5" /> },
   { label: "Calendar", href: "/hr/calendar", icon: <Calendar className="h-5 w-5" /> },
-  { label: "Notifications", href: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
 ];
 
 const adminNav: NavItem[] = [
@@ -78,7 +77,6 @@ const adminNav: NavItem[] = [
   { label: "Reports", href: "/admin/reports", icon: <FileText className="h-5 w-5" /> },
   { label: "Calendar", href: "/admin/calendar", icon: <Calendar className="h-5 w-5" /> },
   { label: "Daily Reports", href: "/hr/daily-reports", icon: <Activity className="h-5 w-5" /> },
-  { label: "Notifications", href: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
   { label: "Settings", href: "/admin/settings", icon: <Settings className="h-5 w-5" /> },
   { label: "Security", href: "/admin/security", icon: <Shield className="h-5 w-5" /> },
 ];

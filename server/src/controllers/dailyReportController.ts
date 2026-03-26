@@ -75,7 +75,7 @@ export async function calculateRealTimePerformance(
   // Task completion score
   const taskCompletionScore = totalTasks > 0
     ? Math.round((tasksCompleted / totalTasks) * 100)
-    : 75; // Default if no tasks
+    : 0; // Fix: 0 instead of 75 for new users
 
   // Project delivery score (based on on-time completion)
   const completedTasks = todayTasks.filter(t => t.status === "completed" && t.completedAt);
@@ -86,7 +86,7 @@ export async function calculateRealTimePerformance(
 
   const projectDeliveryScore = completedTasks.length > 0
     ? Math.round((onTimeCompletions / completedTasks.length) * 100)
-    : 50; // Default if no completed tasks
+    : 0; // Fix: 0 instead of 50 for new users
 
   // Overall score calculation
   const overallScore = Math.round(
@@ -143,7 +143,11 @@ export const generateDailyReport = async (req: Request, res: Response) => {
         const checkOut = `${hh}:${mm}`;
 
         const [inH, inM] = attendance.checkIn.split(":").map(Number);
-        const hours = Math.round(((now.getHours() * 60 + now.getMinutes()) - (inH * 60 + inM)) / 60 * 100) / 100;
+        const nowMins = now.getHours() * 60 + now.getMinutes();
+        const inMins = inH * 60 + inM;
+        let diffMins = nowMins - inMins;
+        if (diffMins < 0) diffMins += 24 * 60; // Handle overnight shifts
+        const hours = Math.round((diffMins / 60) * 100) / 100;
 
         await Attendance.findByIdAndUpdate(attendance._id, {
           checkOut,

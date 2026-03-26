@@ -6,6 +6,8 @@ import Task from "@/models/Task";
 import Appraisal from "@/models/Appraisal";
 import SystemLog from "@/models/SystemLog";
 import { sendMonthlyAppraisalSMS, sendAppraisalReminderSMS } from "@/utils/sms";
+import { createNotification } from "./notificationController";
+
 
 export const createAttendanceRecord = async (req: Request, res: Response) => {
   try {
@@ -171,6 +173,16 @@ export const createTask = async (req: Request, res: Response) => {
       ipAddress: req.ip,
     });
 
+    // Send notification to the user
+    await createNotification(
+      req.user.companyId,
+      "task",
+      "New Task Assigned",
+      `A new task has been assigned to you: ${title}`,
+      task._id,
+      [userId]
+    );
+
     res.status(201).json({
       success: true,
       message: "Task created",
@@ -254,6 +266,16 @@ export const updateTask = async (req: Request, res: Response) => {
       description: `Task "${task.title}" updated`,
       ipAddress: req.ip,
     });
+
+    // Send notification to the user
+    await createNotification(
+      req.user.companyId,
+      "task",
+      "Task Updated",
+      `Task "${task.title}" has been updated to "${task.status}"`,
+      task._id,
+      [task.userId]
+    );
 
     res.json({
       success: true,
@@ -401,6 +423,17 @@ export const updateAppraisal = async (req: Request, res: Response) => {
     if (!appraisal) {
       return res.status(404).json({ success: false, message: "Appraisal not found" });
     }
+
+    // Notify employee about the review/update
+    const statusLabel = appraisal.status === "approved" ? "approved ✅" : appraisal.status === "rejected" ? "marked for revision ❌" : "updated 📝";
+    await createNotification(
+      req.user.companyId,
+      "appraisal",
+      `Appraisal Update: ${appraisal.month} ${appraisal.year}`,
+      `Your appraisal for ${appraisal.month} ${appraisal.year} has been ${statusLabel} by HR. Final Rating: ${appraisal.finalRating || "Pending"}.`,
+      appraisal._id,
+      [appraisal.userId as string]
+    );
 
     await SystemLog.create({
       userId: req.user.userId,
@@ -579,23 +612,29 @@ export const generateMonthlyAppraisals = async (req: Request, res: Response) => 
           continue; // Skip if already generated
         }
 
-        // Get attendance records for the month
+        // Get the number of days in the requested month
+        const lastDayOfMonth = new Date(year, month, 0).getDate();
+        const paddedMonth = month.toString().padStart(2, "0");
+        const startDateStr = `${year}-${paddedMonth}-01`;
+        const endDateStr = `${year}-${paddedMonth}-${lastDayOfMonth}`;
+
+        // Get attendance records for the month (Attendance.date is a String)
         const attendanceRecords = await Attendance.find({
           userId: employee._id,
           companyId: req.user.companyId,
           date: {
-            $gte: new Date(`${year}-${month.toString().padStart(2, "0")}-01`),
-            $lte: new Date(`${year}-${month.toString().padStart(2, "0")}-31`),
+            $gte: startDateStr,
+            $lte: endDateStr,
           },
         });
 
-        // Get tasks for the month
+        // Get tasks for the month (Task.createdAt is a Date)
         const taskRecords = await Task.find({
           userId: employee._id,
           companyId: req.user.companyId,
           createdAt: {
-            $gte: new Date(`${year}-${month.toString().padStart(2, "0")}-01`),
-            $lte: new Date(`${year}-${month.toString().padStart(2, "0")}-31`),
+            $gte: new Date(`${startDateStr}T00:00:00Z`),
+            $lte: new Date(`${endDateStr}T23:59:59Z`),
           },
         });
 
@@ -609,19 +648,26 @@ export const generateMonthlyAppraisals = async (req: Request, res: Response) => 
             )
             : 0;
 
+        const totalTasks = taskRecords.length;
         const completedTasks = taskRecords.filter(t => t.status === "completed").length;
+        
+        // Fix: Default to 0 for new users with no tasks
         const taskCompletionScore =
-          taskRecords.length > 0 ? Math.round((completedTasks / taskRecords.length) * 100) : 75;
+          totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
         const onTimeCompletions = taskRecords
-          .filter(t => t.status === "completed" && new Date(t.completedAt!) <= new Date(t.dueDate))
-          .filter(t => t.completedAt).length;
+          .filter(t => t.status === "completed" && t.completedAt && t.dueDate && new Date(t.completedAt) <= new Date(t.dueDate))
+          .length;
 
+        // Fix: Default to 0 for new users with no completed tasks
         const projectDeliveryScore =
-          completedTasks > 0 ? Math.round((onTimeCompletions / completedTasks) * 100) : 50;
+          completedTasks > 0 ? Math.round((onTimeCompletions / completedTasks) * 100) : 0;
 
         const overallScore = Math.round(
-          attendanceScore * 0.25 + (100 - (100 - taskCompletionScore) * 0.5) * 0.35 + projectDeliveryScore * 0.25 + 75 * 0.15
+          attendanceScore * 0.25 + 
+          taskCompletionScore * 0.35 + 
+          projectDeliveryScore * 0.25 + 
+          0 * 0.15 // Placeholder for behavior/manual adjustment
         );
 
         // Create appraisal record
@@ -640,6 +686,16 @@ export const generateMonthlyAppraisals = async (req: Request, res: Response) => 
           status: "pending",
           generatedAt: new Date(),
         });
+        // Create in-app notification for employee
+        await createNotification(
+          req.user.companyId,
+          "appraisal",
+          `Monthly Appraisal Generated: ${monthName} ${year}`,
+          `Your performance report for ${monthName} ${year} has been generated with an overall score of ${overallScore}%. It is currently pending HR review.`,
+          appraisal._id,
+          [employee._id as string]
+        );
+
         appraisals.push(appraisal);
         generatedCount++;
 

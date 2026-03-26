@@ -157,13 +157,18 @@ export default function HRReports() {
   const handleGenerateReports = async () => {
     setIsGenerating(true);
     try {
-      // Generate appraisals for all employees
-      // Note: This would need a backend endpoint to generate appraisals
-      // For now, show message that appraisals are generated automatically
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success(`Performance data calculated for ${monthNames[selectedMonth]} ${selectedYear}`);
-    } catch (error) {
-      toast.error("Failed to generate reports");
+      // Trigger actual appraisal generation for the selected period
+      const response = await apiClient.generateMonthlyAppraisals(selectedMonth + 1, selectedYear);
+      if (response.success) {
+        toast.success(`Performance reports generated for ${monthNames[selectedMonth]} ${selectedYear}`);
+        // The useEffect will pick up new data automatically due to state change or trigger
+        // But let's manually trigger a data fetch too
+        window.location.reload(); // Quickest way to ensure everything is fresh
+      } else {
+        toast.error(response.message || "Failed to generate records");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to generate reports");
     } finally {
       setIsGenerating(false);
     }

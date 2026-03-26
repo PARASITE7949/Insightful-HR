@@ -65,6 +65,10 @@ export interface IAppraisalReport {
   status: "pending" | "reviewed" | "approved" | "rejected";
   hrComments?: string;
   finalRating?: "exceptional" | "exceeds-expectations" | "meets-expectations" | "needs-improvement" | "unsatisfactory";
+  promotionRecommended?: boolean;
+  bonusRecommended?: boolean;
+  bonusAmount?: number;
+  incrementPercentage?: number;
 }
 
 export interface ISystemLog {

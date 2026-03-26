@@ -45,12 +45,31 @@ export const createHoliday = async (req: Request, res: Response) => {
       }
     }
 
+    // Helper function to format holiday type for title
+    const formatType = (t: string) => {
+      if (t === "holiday") return "Holiday";
+      if (t === "festival") return "Festival";
+      if (t === "government") return "Government Holiday";
+      if (t === "company_event") return "Company Event";
+      return "Holiday";
+    };
+
+    const notificationTitle = `New ${formatType(type)}: ${name}`;
+
     // Create in-app notifications for all company users
     const notificationMessage = description || `No additional details provided.`;
+    // Map holiday type to notification type
+    const mapToNotifType = (t: string) => {
+      if (t === "festival") return "festival";
+      if (t === "government") return "government";
+      if (t === "company_event") return "event";
+      return "holiday";
+    };
+
     const notificationCount = await createNotification(
       req.user.companyId,
-      "holiday",
-      `New Holiday: ${name}`,
+      mapToNotifType(type) as any,
+      notificationTitle,
       `A new event has been announced for ${date}. ${notificationMessage}`,
       holiday._id
     );
@@ -177,12 +196,31 @@ export const updateHoliday = async (req: Request, res: Response) => {
       }
     }
 
+    // Helper function to format holiday type for title
+    const formatType = (t: string) => {
+      if (t === "holiday") return "Holiday";
+      if (t === "festival") return "Festival";
+      if (t === "government") return "Government Holiday";
+      if (t === "company_event") return "Company Event";
+      return "Holiday";
+    };
+
+    const notificationTitle = `Updated ${formatType(holiday.type)}: ${holiday.name}`;
+
     // Create in-app notifications for all company users about the update
     const notificationMessage = holiday.description || `Holiday details have been updated.`;
+    // Map holiday type to notification type
+    const mapToNotifType = (t: string) => {
+      if (t === "festival") return "festival";
+      if (t === "government") return "government";
+      if (t === "company_event") return "event";
+      return "holiday";
+    };
+
     const notificationCount = await createNotification(
       req.user.companyId,
-      "holiday",
-      `Updated: ${holiday.name}`,
+      mapToNotifType(holiday.type) as any,
+      notificationTitle,
       `The event scheduled for ${holiday.date} has been updated. ${notificationMessage}`,
       holiday._id
     );

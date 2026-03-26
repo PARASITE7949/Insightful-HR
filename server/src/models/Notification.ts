@@ -5,7 +5,7 @@ interface NotificationDocument extends Omit<Document, "_id"> {
   _id: string;
   companyId: string;
   userId?: string; // If empty, it's for all users in company
-  type: "holiday" | "appraisal" | "report" | "announcement" | "system";
+  type: "holiday" | "appraisal" | "report" | "announcement" | "system" | "task" | "festival" | "event" | "government";
   title: string;
   message: string;
   relatedId?: string; // e.g., holidayId, appraisalId
@@ -32,7 +32,7 @@ const notificationSchema = new Schema<NotificationDocument>(
     },
     type: {
       type: String,
-      enum: ["holiday", "appraisal", "report", "announcement", "system"],
+      enum: ["holiday", "appraisal", "report", "announcement", "system", "task", "festival", "event", "government"],
       required: [true, "Notification type is required"],
     },
     title: {

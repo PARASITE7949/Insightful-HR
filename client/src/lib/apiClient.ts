@@ -1,4 +1,21 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const getApiBaseUrl = () => {
+  // 1. If explicitly defined in environment variables (via Vite build or Render Dashboard), use that
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  
+  // 2. Automated detection for local development vs production
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  
+  if (isLocal) {
+    return "http://localhost:5001/api"; // Default backend port for local dev
+  }
+  
+  // 3. For production (Render), assume API is on the same domain at /api
+  // If the backend is on a different subdomain, the user should set VITE_API_URL in Render dashboard.
+  return "/api"; 
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
 
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -57,9 +74,16 @@ class ApiClient {
           window.location.href = "/login";
         }
 
+        let message = "Session expired. Please login again.";
+        try {
+          const clone = response.clone();
+          const errorData = await clone.json();
+          if (errorData.message) message = errorData.message;
+        } catch (e) {}
+
         return {
           success: false,
-          message: "Session expired. Please login again.",
+          message: message,
           data: null as any,
         };
       }

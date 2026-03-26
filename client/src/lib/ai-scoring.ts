@@ -43,7 +43,7 @@ function calculatePunctualityScore(attendance: AttendanceRecord[], companyId: st
 }
 
 function calculateTaskCompletionScore(tasks: Task[]): number {
-  if (tasks.length === 0) return 75;
+  if (tasks.length === 0) return 0;
   
   const completedTasks = tasks.filter(t => t.status === "completed").length;
   const completionRate = (completedTasks / tasks.length) * 100;
@@ -56,7 +56,7 @@ function calculateTaskCompletionScore(tasks: Task[]): number {
 }
 
 function calculateProjectScore(tasks: Task[]): number {
-  if (tasks.length === 0) return 75;
+  if (tasks.length === 0) return 0;
   
   const completedTasks = tasks.filter(t => t.status === "completed");
   
@@ -65,7 +65,7 @@ function calculateProjectScore(tasks: Task[]): number {
     return new Date(task.completedAt) <= new Date(task.dueDate);
   }).length;
   
-  const onTimeRate = completedTasks.length > 0 ? (onTimeCompletions / completedTasks.length) * 100 : 50;
+  const onTimeRate = completedTasks.length > 0 ? (onTimeCompletions / completedTasks.length) * 100 : 0;
   
   return Math.round(onTimeRate);
 }

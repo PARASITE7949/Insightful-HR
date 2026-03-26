@@ -123,7 +123,7 @@ async function calculatePerformanceFromAPI(
   const completedTasks = tasks.filter((t: any) => t.status === "completed").length;
   const taskCompletionScore = tasks.length > 0
     ? Math.round((completedTasks / tasks.length) * 100)
-    : 75; // Default if no tasks
+    : 0; // Default if no tasks
 
   // Calculate Project Delivery Score
   const completedTaskList = tasks.filter((t: any) => t.status === "completed");
@@ -134,7 +134,7 @@ async function calculatePerformanceFromAPI(
 
   const projectScore = completedTaskList.length > 0
     ? Math.round((onTimeCompletions / completedTaskList.length) * 100)
-    : 50; // Default if no completed tasks
+    : 0; // Default if no completed tasks
 
   // Calculate Overall Score (weighted average)
   const overallScore = Math.round(
@@ -549,17 +549,38 @@ export default function EmployeePerformance() {
                       <p className="font-medium">{appraisal.month} {appraisal.year}</p>
                       <p className="text-sm text-muted-foreground">Score: {appraisal.overallScore || 0}%</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={
-                        appraisal.status === "approved" ? "default" :
-                        appraisal.status === "reviewed" ? "secondary" :
-                        appraisal.status === "rejected" ? "destructive" : "outline"
-                      }>
-                        {appraisal.status}
-                      </Badge>
-                      {appraisal.finalRating && (
-                        <Badge variant="outline">{appraisal.finalRating}</Badge>
-                      )}
+                    <div className="flex flex-col items-end gap-2 text-right">
+                      <div className="flex items-center gap-2">
+                        <Badge variant={
+                          appraisal.status === "approved" ? "default" :
+                          appraisal.status === "reviewed" ? "secondary" :
+                          appraisal.status === "rejected" ? "destructive" : "outline"
+                        }>
+                          {appraisal.status}
+                        </Badge>
+                        {appraisal.finalRating && (
+                          <Badge variant="outline">{appraisal.finalRating}</Badge>
+                        )}
+                      </div>
+                      
+                      {/* Reward Details */}
+                      <div className="flex flex-wrap justify-end gap-1 mt-1">
+                        {appraisal.bonusRecommended && appraisal.bonusAmount > 0 && (
+                          <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100">
+                            Bonus: ₹{appraisal.bonusAmount.toLocaleString()}
+                          </Badge>
+                        )}
+                        {appraisal.incrementPercentage > 0 && (
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100">
+                            +{appraisal.incrementPercentage}% Increment
+                          </Badge>
+                        )}
+                        {appraisal.promotionRecommended && (
+                          <Badge variant="secondary" className="bg-purple-100 text-purple-700 hover:bg-purple-100 font-bold">
+                            Promotion Recommended!
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
