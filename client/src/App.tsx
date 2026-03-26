@@ -34,7 +34,6 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
 import AdminSettings from "./pages/admin/Settings";
 import PendingApprovals from "./pages/admin/PendingApprovals";
-import ManageNotifications from "./pages/admin/ManageNotifications";
 
 import SecurityLogs from "./pages/admin/SecurityLogs";
 
@@ -83,7 +82,6 @@ const App = () => (
             <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={["admin_staff"]}><HRReports /></ProtectedRoute>} />
             <Route path="/admin/calendar" element={<ProtectedRoute allowedRoles={["admin_staff"]}><HRCalendar /></ProtectedRoute>} />
             <Route path="/admin/security" element={<ProtectedRoute allowedRoles={["admin_staff"]}><SecurityLogs /></ProtectedRoute>} />
-            <Route path="/admin/notifications" element={<ProtectedRoute allowedRoles={["admin_staff", "hr_manager"]}><ManageNotifications /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

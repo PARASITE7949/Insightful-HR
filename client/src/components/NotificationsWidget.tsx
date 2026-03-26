@@ -85,51 +85,6 @@ export function NotificationsWidget() {
     }
   };
 
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case "holiday":
-        return "🎉";
-      case "festival":
-        return "🎡";
-      case "government":
-        return "🏛️";
-      case "event":
-        return "🎯";
-      case "appraisal":
-        return "📊";
-      case "report":
-        return "📋";
-      case "announcement":
-        return "📢";
-      case "task":
-        return "📋";
-      default:
-        return "🔔";
-    }
-  };
-
-  const getNotificationColor = (type: string) => {
-    switch (type) {
-      case "holiday":
-        return "text-blue-600";
-      case "festival":
-        return "text-pink-600";
-      case "government":
-        return "text-indigo-600";
-      case "event":
-        return "text-rose-600";
-      case "appraisal":
-        return "text-green-600";
-      case "report":
-        return "text-purple-600";
-      case "announcement":
-        return "text-orange-600";
-      case "task":
-        return "text-emerald-600";
-      default:
-        return "text-gray-600";
-    }
-  };
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -184,9 +139,6 @@ export function NotificationsWidget() {
                 }
               >
                 <div className="flex items-start gap-3">
-                  <span className="text-lg mt-1">
-                    {getNotificationIcon(notification.type)}
-                  </span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-medium text-sm line-clamp-2">

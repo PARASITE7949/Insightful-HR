@@ -1,13 +1,13 @@
-# 🏢 Insightful HR - Full Stack Application
+# Insightful HR - Full Stack Application
 
 A comprehensive Human Resources management system with React frontend and Node.js backend.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 insightful-hr-main/
 │
-├── client/                          #  React Frontend (Vite)
+├── client/                          # React Frontend (Vite)
 │   ├── src/
 │   │   ├── components/             # React components
 │   │   ├── contexts/               # Auth context
@@ -22,7 +22,7 @@ insightful-hr-main/
 │   ├── .env.example
 │   └── README.md
 │
-├── server/                          # ⚙️ Express Backend
+├── server/                          # Express Backend
 │   ├── src/
 │   │   ├── models/                 # Mongoose models
 │   │   ├── controllers/            # Request handlers
@@ -37,7 +37,7 @@ insightful-hr-main/
 │   ├── .env.example
 │   └── README.md
 │
-├── docs/                            # 📚 Documentation
+├── docs/                            # Documentation
 │   ├── API.md                      # API reference
 │   ├── SETUP.md                    # Setup guide
 │   ├── TESTING.md                  # Testing guide
@@ -49,7 +49,7 @@ insightful-hr-main/
 └── package.json                     # Root scripts (optional)
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js v16+ and npm
@@ -72,7 +72,7 @@ cp .env.example .env
 npm run dev
 ```
 
-✅ Backend runs on: `http://localhost:5001`
+Backend runs on: `http://localhost:5001`
 
 ### 3️⃣ Setup Frontend (New Terminal)
 
@@ -83,7 +83,7 @@ cp .env.example .env
 npm run dev
 ```
 
-✅ Frontend runs on: `http://localhost:5173`
+Frontend runs on: `http://localhost:5173`
 
 ### 4️⃣ Test the Application
 
@@ -91,40 +91,40 @@ Open browser: `http://localhost:5173`
 
 Follow the [E2E Testing Guide](docs/TESTING.md) for detailed testing procedures.
 
-## 📋 Project Features
+## Project Features
 
-### 👤 User Management
+### User Management
 - Multi-role support (Super Admin, HR Manager, Admin, Employee)
 - User registration with OTP verification
 - JWT-based authentication
 - Company-based data isolation
 
-### 📊 Attendance System
+### Attendance System
 - Daily check-in/check-out tracking
 - Attendance status management
 - Working hours calculation
 - Monthly reports
 
-### 📝 Task Management
+### Task Management
 - Task creation and assignment
 - Priority and status tracking
 - Due date management
 - Task completion logging
 
-### 📈 Performance Appraisals
+### Performance Appraisals
 - Monthly/yearly appraisals
 - Performance scoring
 - AI-powered analysis (extensible)
 - Appraisal workflow
 
-### 🔐 Security
+### Security
 - Password hashing (bcrypt)
 - JWT authentication
 - Role-based access control
 - Rate limiting
 - Audit logging
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Frontend
 - React 18.3
@@ -145,7 +145,7 @@ Follow the [E2E Testing Guide](docs/TESTING.md) for detailed testing procedures.
 - Morgan Logging
 - Helmet Security
 
-## 📖 Documentation
+## Documentation
 
 | Document | Purpose |
 |----------|---------|
@@ -156,7 +156,7 @@ Follow the [E2E Testing Guide](docs/TESTING.md) for detailed testing procedures.
 | [Client README](client/README.md) | Frontend documentation |
 | [Server README](server/README.md) | Backend documentation |
 
-## 🧪 Testing
+## Testing
 
 ### API Testing
 ```bash
@@ -173,7 +173,7 @@ cat docs/TESTING.md
 3. Test all features
 4. Follow [Testing Guide](docs/TESTING.md)
 
-## 🗄️ Database Setup
+## Database Setup
 
 ### Option 1: Local MongoDB
 ```bash
@@ -194,7 +194,7 @@ start mongod
 # Update MONGODB_URI in server/.env
 ```
 
-## 📚 API Endpoints
+## API Endpoints
 
 ### Authentication
 ```
@@ -219,7 +219,7 @@ GET    /api/users/:userId/appraisals
 
 See [API Documentation](docs/API.md) for complete reference.
 
-## 🔧 Available Scripts
+## Available Scripts
 
 ### Frontend
 ```bash
@@ -243,7 +243,7 @@ npm run lint       # Run ESLint
 npm run test       # Run tests
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### MongoDB Connection Error
 - Ensure MongoDB is running: `mongod`
@@ -276,7 +276,7 @@ cd ../server && npm install
 
 See [Testing Guide](docs/TESTING.md#troubleshooting) for more issues.
 
-## 📦 Dependencies
+## Dependencies
 
 ### Frontend
 See [client/package.json](client/package.json)
@@ -284,7 +284,7 @@ See [client/package.json](client/package.json)
 ### Backend
 See [server/package.json](server/package.json)
 
-## 🚢 Deployment
+## Deployment
 
 ### Frontend Deployment (Vercel/Netlify)
 ```bash
@@ -302,38 +302,42 @@ npm start
 
 Set environment variables in deployment platform.
 
-## 🔐 Security Considerations
+## Security Considerations
 
-- ✅ Passwords hashed with bcrypt
-- ✅ JWT tokens (7 days expiry)
-- ✅ Role-based access control
-- ✅ Rate limiting enabled
-- ✅ CORS configured
-- ✅ Helmet security headers
-- ✅ Input validation
-- ✅ Audit logging
+- Passwords hashed with bcrypt
+- JWT tokens (7 days expiry)
+- Role-based access control
+- Rate limiting enabled
+- CORS configured
+- Helmet security headers
+- Input validation
+- Audit logging
 
-## 📞 Support
+## Support
 
 1. **Setup Issues** → See [SETUP.md](SETUP.md)
 2. **API Issues** → See [docs/API.md](docs/API.md)
 3. **Testing Problems** → See [docs/TESTING.md](docs/TESTING.md)
 4. **Database Questions** → See [docs/DATABASE.md](docs/DATABASE.md)
 
-## 📝 Project Status
+## Project Status
 
-✅ Backend: Production Ready
-✅ Frontend: Production Ready
-✅ Database: Fully Integrated
-✅ Authentication: Implemented
-✅ Testing: Complete Guide
-✅ Documentation: Comprehensive
-✅ Security: Multiple Layers
-✅ Ready for Deployment
+- Backend: Production Ready
+- Frontend: Production Ready
+- Database: Fully Integrated
+- Authentication: Implemented
+- Testing: Complete Guide
+- Documentation: Comprehensive
+- Security: Multiple Layers
+- Ready for Deployment
 
-## 📄 License
+## License
 
 Proprietary - All rights reserved
+
+## Team
+
+Built with ❤️ for HR Management
 
 ## 👥 Team
 
